@@ -37,7 +37,7 @@ const signupUser = async (req, res) => {
     const user = await User.findOne({ $or: [{ email }, { username }] }); // to find through email or username
 
     if (user) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ error: "User already exists" });
     }
 
     const salt = await bcrypt.genSalt(10); // 10 is good, anymore is slower
@@ -61,10 +61,10 @@ const signupUser = async (req, res) => {
         username: newUser.username,
       });
     } else {
-      res.status(400).json({ message: "Invalid user data" });
+      res.status(400).json({ error: "Invalid user data" });
     }
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message });
     console.log("Error in signupUser: ", err.message);
   }
 };
@@ -79,7 +79,7 @@ const loginUser = async (req, res) => {
     );
 
     if (!user || !isPasswordCorrect)
-      return res.status(400).json({ message: "Invalid username or password" });
+      return res.status(400).json({ error: "Invalid username or password" });
 
     generateTokenAndSetCookie(user._id, res);
 
@@ -90,7 +90,7 @@ const loginUser = async (req, res) => {
       username: user.username,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
     console.log("Error in loginUser: ", error.message);
   }
 };
