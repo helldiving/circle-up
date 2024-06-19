@@ -85,12 +85,14 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ error: "Invalid username or password" });
 
     generateTokenAndSetCookie(user._id, res);
-
+    // if you change the above adding occuption: newUser.occupation, make sure to add occupation: user.occupation down here
     res.status(200).json({
       _id: user._id,
       name: user.name,
       email: user.email,
       username: user.username,
+      bio: user.bio,
+      profilePic: user.profilePic,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
