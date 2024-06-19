@@ -33,7 +33,6 @@ export default function SignupCard() {
   const toast = useToast();
 
   const handleSignup = async () => {
-    console.log(inputs);
     try {
       const res = await fetch("/api/users/signup", {
         method: "POST",
@@ -42,7 +41,20 @@ export default function SignupCard() {
         },
         body: JSON.stringify(inputs),
       });
+
       const data = await res.json();
+      console.log("Signup successful:", data);
+      //   const handleSignup = async () => {
+      //     console.log(inputs);
+      //     try {
+      //       const res = await fetch("/api/users/signup", {
+      //         method: "POST",
+      //         headers: {
+      //           "Content-Type": "application/json",
+      //         },
+      //         body: JSON.stringify(inputs),
+      //       });
+      //       const data = await res.json();
 
       if (data.error) {
         toast({
@@ -79,7 +91,7 @@ export default function SignupCard() {
             <HStack>
               <Box>
                 <FormControl isRequired>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>Full name</FormLabel>
                   <Input
                     type="text"
                     onChange={(e) =>
@@ -103,7 +115,7 @@ export default function SignupCard() {
               </Box>
             </HStack>
             <FormControl isRequired>
-              <FormLabel>Email Address</FormLabel>
+              <FormLabel>Email address</FormLabel>
               <Input
                 type="email"
                 onChange={(e) =>
@@ -138,10 +150,10 @@ export default function SignupCard() {
               <Button
                 loadingText="Submitting"
                 size="lg"
-                bg={useColorModeValue("gray.600", "gray.700")} // background for sign up page - maybe change to a video background?
+                bg={useColorModeValue("gray.600", "gray.700")}
                 color={"white"}
                 _hover={{
-                  bg: useColorModeValue("gray.700", "gray.800"), // sign up button color
+                  bg: useColorModeValue("gray.700", "gray.800"),
                 }}
                 onClick={handleSignup}
               >

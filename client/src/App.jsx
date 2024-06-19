@@ -22,7 +22,7 @@ function App() {
         />
         <Route
           path="/auth"
-          element={!user ? <AuthPage /> : <Navigate to="/home" />}
+          element={!user ? <AuthPage /> : <Navigate to="/" />}
         />
 
         <Route path="/:username" element={<UserPage />} />
