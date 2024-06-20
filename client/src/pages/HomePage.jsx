@@ -1,12 +1,9 @@
 import { Box, Button, Flex, Spinner } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast";
-// import Post from "../components/Post";
+import Post from "../components/Post";
 import { useRecoilState } from "recoil";
 import { Link } from "react-router-dom";
-import Post from "../components/Post.jsx";
-// import postsAtom from "../atoms/postsAtom";
-// import SuggestedUsers from "../components/SuggestedUsers";
 
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
@@ -15,6 +12,7 @@ const HomePage = () => {
   useEffect(() => {
     const getFeedPosts = async () => {
       setLoading(true);
+      setPosts([]);
 
       try {
         const res = await fetch("/api/posts/feed");
@@ -27,12 +25,13 @@ const HomePage = () => {
         setPosts(data);
       } catch (error) {
         showToast("Error", error.message, "error");
+        setPosts([]); // take out maybe
       } finally {
         setLoading(false);
       }
     };
     getFeedPosts();
-  }, [showToast]);
+  }, [showToast, setPosts]);
 
   return (
     <Flex gap="10" alignItems={"flex-start"}>
