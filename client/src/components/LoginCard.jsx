@@ -50,7 +50,7 @@ export default function LoginCard() {
         return;
       }
 
-      localStorage.setItem("user-threads", JSON.stringify(data));
+      localStorage.setItem("user-info", JSON.stringify(data));
       setUser(data); // updates user's state navigating us to the homepage
     } catch (error) {
       showToast("Error", error, "error");

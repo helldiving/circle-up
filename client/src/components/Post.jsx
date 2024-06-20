@@ -28,7 +28,7 @@ const Post = ({ post, postedBy }) => {
         setUser(data);
       } catch (error) {
         showToast("Error", error.message, "error");
-        setUser(null);
+        setUser(null); // in case if errors
       }
     };
 

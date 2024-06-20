@@ -18,24 +18,55 @@ import { CgMoreO } from "react-icons/cg";
 import { useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
 import { Link as RouterLink } from "react-router-dom";
-import useFollowUnfollow from "../hooks/useFollowUnfollow";
+import { useState } from "react";
 
 const UserHeader = ({ user }) => {
   const toast = useToast();
   const currentUser = useRecoilValue(userAtom); // logged in user
-  const { handleFollowUnfollow, following, updating } = useFollowUnfollow(user);
+  const [following, setFollowing] = useState(
+    user.followers.includes(currentUser._id)
+  );
+  const showToast = useToast();
+  const [updating, setUpdating] = useState(false);
 
-  const copyURL = () => {
-    const currentURL = window.location.href;
-    navigator.clipboard.writeText(currentURL).then(() => {
-      toast({
-        title: "Success!",
-        description: "Profile link copied.",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
+  const copyURL = () => {};
+
+  const handleFollowUnfollow = async () => {
+    if (!currentUser) {
+      showToast("Error", "Please login to follow", "error");
+      return;
+    }
+    if (updating) return;
+    setUpdating(true);
+
+    try {
+      const res = await fetch(`/api/users/follow/$user._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
-    });
+
+      const data = await res.json();
+      if (data.error) {
+        showToast("Error", data.error, "error");
+        return;
+      }
+
+      if (following) {
+        showToast("Success", `Unfollowed ${user.name}`, "success");
+        user.followers.pop(); // simulate removing form followers
+      } else {
+        showToast("Success", `Followed ${user.name}`, "success");
+        user.followers.push(currentUser._id); // simulate adding to followers
+      }
+      setFollowing(!following);
+      console.log(data);
+    } catch (error) {
+      showToast("Error", error.message, "error");
+    } finally {
+      setUpdating(false);
+    }
   };
 
   return (
@@ -96,9 +127,9 @@ const UserHeader = ({ user }) => {
 
       <Flex w={"full"} justifyContent={"space-between"}>
         <Flex gap={2} alignItems={"center"}>
-          <Text color={"gray.light"}>{user.followers.length}</Text>
+          <Text color={"gray.light"}>{user.followers.length} followers</Text>
           <Box w={"1"} h={"1"} bg={"gray.light"} borderRadius={"full"}></Box>
-          <Link color={"gray.light"}>instagram.com/sandsniffer</Link>
+          <Link color={"gray.light"}>instagram.com</Link>
         </Flex>
         <Flex>
           <Box className="icon-container">

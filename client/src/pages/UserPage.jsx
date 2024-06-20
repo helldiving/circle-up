@@ -3,7 +3,7 @@ import UserHeader from "../components/UserHeader";
 import { useParams } from "react-router-dom";
 import useShowToast from "../hooks/useShowToast";
 import { Flex, Spinner } from "@chakra-ui/react";
-import Post from "../components/Post";
+import UserPost from "../components/UserPost";
 import { useRecoilState } from "recoil";
 
 const UserPage = () => {
@@ -21,7 +21,7 @@ const UserPage = () => {
           showToast("Error", data.error, "error");
           return;
         }
-        console.log(data);
+        setUser(data);
       } catch (error) {
         showToast("Error", error, "error");
       } finally {

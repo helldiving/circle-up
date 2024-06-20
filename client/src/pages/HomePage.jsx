@@ -13,6 +13,12 @@ const HomePage = () => {
 
       try {
         const res = await fetch("/api/posts/feed");
+        // take out the below if function
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Failed to fetch feed posts");
+        }
+        // take out the above if function
         const data = await res.json();
         console.log(data);
         setPosts(data);

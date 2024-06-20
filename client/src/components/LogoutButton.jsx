@@ -23,7 +23,7 @@ const LogoutButton = () => {
         return;
       }
 
-      localStorage.removeItem("user-threads"); // if error will clear local storage
+      localStorage.removeItem("user-info"); // if error will clear local storage
       setUser(null); // and will clear state
     } catch (error) {
       showToast("Error", error, "error");
