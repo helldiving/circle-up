@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Button,
   Flex,
@@ -29,16 +27,19 @@ export default function UpdateProfilePage() {
     username: user.username,
     email: user.email,
     bio: user.bio,
-    password: user.Avatar,
+    password: "",
   });
 
   const fileRef = useRef(null);
+  const [updating, setUpdating] = useState(false);
 
   const showToast = useShowToast();
 
   const { handleImageChange, imgUrl } = usePreviewImg();
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (updating) return;
+    setUpdating(true);
 
     try {
       const res = await fetch(`/api/users/update/${user._id}`, {
@@ -48,10 +49,18 @@ export default function UpdateProfilePage() {
         },
         body: JSON.stringify({ ...inputs, profilePic: imgUrl }),
       });
-      const data = await res.json();
-      console.log(data);
+      const data = await res.json(); // updated user object/data
+      if (data.error) {
+        showToast("Error", data.error, "error");
+        return;
+      }
+      showToast("Success", "Profile updated successfully", "success");
+      setUser(data);
+      localStorage.setItem("user-info", JSON.stringify(data));
     } catch (error) {
       showToast("Error", error, "error");
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -166,6 +175,7 @@ export default function UpdateProfilePage() {
                 bg: "green.500",
               }}
               type="submit"
+              isLoading={updating}
             >
               Submit
             </Button>

@@ -27,12 +27,15 @@ export default function LoginCard() {
   const [showPassword, setShowPassword] = useState(false);
   const setAuthScreen = useSetRecoilState(authScreenAtom);
   const setUser = useSetRecoilState(userAtom);
+  const [loading, setLoading] = useState(false);
+
   const [inputs, setInputs] = useState({
     username: "",
     password: "",
   });
   const showToast = useShowToast();
   const handleLogin = async () => {
+    setLoading(true);
     try {
       const res = await fetch("/api/users/login", {
         method: "POST",
@@ -47,11 +50,12 @@ export default function LoginCard() {
         return;
       }
 
-      console.log(data);
       localStorage.setItem("user-threads", JSON.stringify(data));
       setUser(data); // updates user's state navigating us to the homepage
     } catch (error) {
       showToast("Error", error, "error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -122,6 +126,7 @@ export default function LoginCard() {
                   bg: useColorModeValue("gray.700", "gray.800"), // sign up button color
                 }}
                 onClick={handleLogin}
+                isLoading={loading}
               >
                 Login
               </Button>
