@@ -23,9 +23,11 @@ import { useState } from "react";
 const UserHeader = ({ user }) => {
   const toast = useToast();
   const currentUser = useRecoilValue(userAtom); // logged in user
+
   const [following, setFollowing] = useState(
     user.followers.includes(currentUser._id)
   );
+
   const showToast = useToast();
   const [updating, setUpdating] = useState(false);
 
