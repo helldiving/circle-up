@@ -5,32 +5,37 @@ import useShowToast from "../hooks/useShowToast";
 import { Flex, Spinner } from "@chakra-ui/react";
 import UserPost from "../components/UserPost";
 import { useRecoilState } from "recoil";
+import Post from "../components/Post";
+import useGetUserProfile from "../hooks/useGetUserProfile";
+import postsAtom from "../atoms/postsAtom";
+// import { set } from "mongoose";
 
 const UserPage = () => {
-  const [user, setUser] = useState(null);
+  const { user, loading } = useGetUserProfile();
   const { username } = useParams();
   const showToast = useShowToast();
-  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useRecoilState(postsAtom);
+  const [fetchingPosts, setFetchingPosts] = useState(true);
 
   useEffect(() => {
-    const getUser = async () => {
+    const getPosts = async () => {
+      if (!user) return;
+      setFetchingPosts(true);
       try {
         const res = await fetch(`/api/posts/user/${username}`);
         const data = await res.json();
-        if (data.error) {
-          showToast("Error", data.error, "error");
-          return;
-        }
-        setUser(data);
+        console.log(data);
+        setPosts(data);
       } catch (error) {
-        showToast("Error", error, "error");
+        showToast("Error", error.message, "error");
+        setPosts([]);
       } finally {
-        setLoading(false);
+        setFetchingPosts(false);
       }
     };
 
-    getUser();
-  }, [username, showToast]);
+    getPosts();
+  }, [username, showToast, setPosts, user]);
 
   if (!user && loading) {
     return (
@@ -39,38 +44,23 @@ const UserPage = () => {
       </Flex>
     );
   }
+
   if (!user && !loading) return <h1>User not found</h1>;
 
   return (
     <>
       <UserHeader user={user} />
-      <UserPost
-        likes={4}
-        replies={2}
-        postImg="/post1.png"
-        postTitle="This man ate my son"
-      />
-      <UserPost
-        likes={10}
-        replies={5}
-        postImg="/post2.png"
-        postTitle="In an attempt to boost player morale, the Bucs have purchased world renowned institution, Mons Venus. Baker Mayfield exclaims this is 'an excellent investment.'"
-      />
-      <UserPost
-        likes={1}
-        replies={10}
-        postImg="/post3.png"
-        postTitle="Breaking: Musk outraged Luka Doncic reaches top 500 in Overwatch before him."
-      />
-      <UserPost
-        likes={4}
-        replies={0}
-        postTitle="Hogwarts is real: the story of my worm trip"
-      />
 
-      {
-        //Replace above text with something along the lines of: "Reddit mods dump GameStop and NVIDIA stock to buy Circle-Up's,launching it past orbit." - Mark Zuckerberg.
-      }
+      {!fetchingPosts && posts.length === 0 && <h1>User has no posts.</h1>}
+      {fetchingPosts && (
+        <Flex justifyContent={"center"} my={12}>
+          <Spinner size={"xl"} />
+        </Flex>
+      )}
+
+      {posts.map((post) => (
+        <Post key={post._id} post={post} postedBy={post.postedBy} />
+      ))}
     </>
   );
 };

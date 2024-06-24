@@ -54,7 +54,7 @@ export default function SignupCard() {
       }
 
       localStorage.setItem("user-info", JSON.stringify(data));
-      setUser(data); // user-info user-threads
+      setUser(data); // user-info
     } catch (error) {
       showToast("Error", data.error, "error");
     }
