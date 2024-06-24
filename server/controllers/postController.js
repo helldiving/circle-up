@@ -141,6 +141,21 @@ const replyToPost = async (req, res) => {
 
 const getFeedPosts = async (req, res) => {
   try {
+    const feedPosts = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate("postedBy", "name username profilePic");
+
+    res.status(200).json(feedPosts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Filtered feed posts for only who users follow
+
+/* // before 
+const getFeedPosts = async (req, res) => {
+  try {
     const userId = req.user._id;
     const user = await User.findById(userId);
     if (!user) {
@@ -157,7 +172,7 @@ const getFeedPosts = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-};
+}; */
 
 const getUserPosts = async (req, res) => {
   const { username } = req.params;

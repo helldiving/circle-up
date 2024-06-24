@@ -21,6 +21,42 @@ const Post = ({ post, postedBy }) => {
   useEffect(() => {
     const getUser = async () => {
       try {
+        // Check if postedBy is already an object with the necessary data
+        if (typeof postedBy === "object" && postedBy._id) {
+          setUser(postedBy);
+          return;
+        }
+
+        // If not, fetch the user data
+        const userId = typeof postedBy === "object" ? postedBy._id : postedBy;
+        const res = await fetch(`/api/users/profile/${userId}`);
+        const data = await res.json();
+
+        if (data.error) {
+          showToast("Error", data.error, "error");
+          return;
+        }
+        setUser(data);
+      } catch (error) {
+        showToast("Error", error.message, "error");
+        setUser(null);
+      }
+    };
+
+    getUser();
+  }, [postedBy, showToast]);
+
+  /* // before: home feed from following only
+const Post = ({ post, postedBy }) => {
+  const [user, setUser] = useState(null);
+  const showToast = useShowToast();
+  const currentUser = useRecoilValue(userAtom);
+  const [posts, setPosts] = useRecoilState(postsAtom);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const getUser = async () => {
+      try {
         const res = await fetch("/api/users/profile/" + postedBy);
         const data = await res.json();
 
@@ -37,7 +73,7 @@ const Post = ({ post, postedBy }) => {
 
     getUser();
   }, [postedBy, showToast]);
-
+*/
   const handleDeletePost = async (e) => {
     try {
       e.preventDefault();

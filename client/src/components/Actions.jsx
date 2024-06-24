@@ -33,8 +33,13 @@ const Actions = ({ post }) => {
   const showToast = useShowToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const handleLikeandUnlike = async () => {
-    if (!user) return showToast("Error", "Please login to like", "error");
+  const handleLikeAndUnlike = async () => {
+    if (!user)
+      return showToast(
+        "Error",
+        "You must be logged in to like a post",
+        "error"
+      );
     if (isLiking) return;
     setIsLiking(true);
     try {
@@ -53,6 +58,7 @@ const Actions = ({ post }) => {
           if (p._id === post._id) {
             return { ...p, likes: [...p.likes, user._id] };
           }
+          return p;
         });
         setPosts(updatedPosts);
       } else {
@@ -63,6 +69,7 @@ const Actions = ({ post }) => {
           }
           return p;
         });
+        setPosts(updatedPosts);
       }
 
       setLiked(!liked);
@@ -118,7 +125,7 @@ const Actions = ({ post }) => {
           role="img"
           viewBox="0 0 24 22"
           width="20"
-          onClick={handleLikeandUnlike}
+          onClick={handleLikeAndUnlike}
         >
           <path
             d="M1 7.66c0 4.575 3.899 9.086 9.987 12.934.338.203.74.406 1.013.406.283 0 .686-.203 1.013-.406C19.1 16.746 23 12.234 23 7.66 23 3.736 20.245 1 16.672 1 14.603 1 12.98 1.94 12 3.352 11.042 1.952 9.408 1 7.328 1 3.766 1 1 3.736 1 7.66Z"

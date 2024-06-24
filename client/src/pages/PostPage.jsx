@@ -15,8 +15,10 @@ import Comment from "../components/Comment";
 import useShowToast from "../hooks/useShowToast";
 import { formatDistanceToNow } from "date-fns";
 import { DeleteIcon } from "@chakra-ui/icons";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import postsAtom from "../atoms/postsAtom";
+import useGetUserProfile from "../hooks/useGetUserProfile";
+import userAtom from "../atoms/userAtom";
 // import { get } from "mongoose";
 
 // we accept the post atom as an array of obejects. inside actions we write our code as posts atoms is an array, so we use map component in Actions.jsx. So here we have to destructure the array and get the first object from the array.

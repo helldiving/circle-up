@@ -44,7 +44,7 @@ const UserHeader = ({ user }) => {
               p={1}
               borderRadius={"full"}
             >
-              threads.net
+              circleup.live
             </Text>
           </Flex>
         </Box>
