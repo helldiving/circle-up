@@ -14,13 +14,18 @@ const HomePage = () => {
       setLoading(true);
       setPosts([]);
       try {
+        // Send a request to fetch the feed posts
         const res = await fetch("/api/posts/feed");
         const data = await res.json();
+
+        // Check for errors in the response
         if (data.error) {
           showToast("Error", data.error, "error");
           return;
         }
         console.log(data);
+
+        // Update the posts state with the fetched posts
         setPosts(data);
       } catch (error) {
         showToast("Error", error.message, "error");
@@ -28,22 +33,27 @@ const HomePage = () => {
         setLoading(false);
       }
     };
+
+    // Fetch the feed posts when the component mounts
     getFeedPosts();
   }, [showToast, setPosts]);
 
   return (
     <Flex gap="10" alignItems={"flex-start"}>
       <Box flex={70}>
+        {/* Render a message if there are no posts and loading is complete */}
         {!loading && posts.length === 0 && (
           <h1>Follow some users to see the feed</h1>
         )}
 
+        {/* Render a loading spinner while posts are being fetched */}
         {loading && (
           <Flex justify="center">
             <Spinner size="xl" />
           </Flex>
         )}
 
+        {/* Render the posts */}
         {posts.map((post) => {
           if (!post || !post.postedBy) {
             console.error("Invalid post data:", post);

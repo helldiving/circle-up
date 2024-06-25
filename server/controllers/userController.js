@@ -13,7 +13,7 @@ const getUserProfile = async (req, res) => {
   try {
     let user;
 
-    // query is userId
+    // Check if the query is a valid userId
     if (mongoose.Types.ObjectId.isValid(query)) {
       user = await User.findOne({ _id: query })
         .select("-password")
@@ -39,14 +39,17 @@ const signupUser = async (req, res) => {
   console.log(req.body);
   try {
     const { name, email, username, password } = req.body;
+    // Check if the user already exists with the provided email or username
     const user = await User.findOne({ $or: [{ email }, { username }] }); // to find through email or username
 
     if (user) {
       return res.status(400).json({ error: "User already exists" });
     }
+    // Hash the password
     const salt = await bcrypt.genSalt(10); // 10 is good, anymore is slower
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Create a new user
     const newUser = new User({
       name,
       email,
@@ -56,6 +59,7 @@ const signupUser = async (req, res) => {
     await newUser.save();
 
     if (newUser) {
+      // Generate a token and set it as a cookie
       generateTokenAndSetCookie(newUser._id, res);
 
       res.status(201).json({
@@ -78,7 +82,9 @@ const signupUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
+    // Find the user by their username
     const user = await User.findOne({ username });
+    // Compare the provided password with the hashed password
     const isPasswordCorrect = await bcrypt.compare(
       password,
       user?.password || ""
@@ -87,6 +93,7 @@ const loginUser = async (req, res) => {
     if (!user || !isPasswordCorrect)
       return res.status(400).json({ error: "Invalid username or password" });
 
+    // Generate a token and set it as a cookie
     generateTokenAndSetCookie(user._id, res);
     // if you change the above adding occuption: newUser.occupation, make sure to add occupation: user.occupation down here
     res.status(200).json({
@@ -105,6 +112,7 @@ const loginUser = async (req, res) => {
 
 const logoutUser = (req, res) => {
   try {
+    // Clear the JWT cookie
     res.cookie("jwt", "", { maxAge: 1 });
     res.status(200).json({ message: "User logged out successfully" });
   } catch (err) {
@@ -119,6 +127,7 @@ const followUnFollowUser = async (req, res) => {
     const userToModify = await User.findById(id);
     const currentUser = await User.findById(req.user._id);
 
+    // Check if the user is trying to follow/unfollow themselves
     if (id === req.user._id.toString())
       return res
         .status(400)
@@ -127,6 +136,7 @@ const followUnFollowUser = async (req, res) => {
     if (!userToModify || !currentUser)
       return res.status(400).json({ error: "User not found" });
 
+    // Check if the current user is already following the user
     const isFollowing = currentUser.following.includes(id);
 
     if (isFollowing) {
@@ -155,20 +165,22 @@ const updateUser = async (req, res) => {
     let user = await User.findById(userId);
     if (!user) return res.status(400).json({ error: "User not found" });
 
+    // Check if the user is authorized to update the profile
     if (req.params.id !== userId.toString())
-      // have to convert to String since object
-      // if migo select screen take out
+      // Have to convert to String since object
+      // If migo select screen take out
       return res
         .status(400)
         .json({ error: "You cannot update other user's profile" });
 
+    // Hash the new password
     if (password) {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
       user.password = hashedPassword;
     }
 
-    // delete old profile pic, upload new one
+    // Delete old profile pic, upload new one
     if (profilePic) {
       if (user.profilePic) {
         await cloudinary.uploader.destroy(
@@ -200,7 +212,7 @@ const updateUser = async (req, res) => {
       { arrayFilters: [{ "reply.userId": userId }] }
     );
 
-    // making password null in response
+    // Making password null in response (removing password from response)
     user.password = null;
 
     res.status(200).json(user);

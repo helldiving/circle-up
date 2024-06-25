@@ -7,7 +7,6 @@ import {
   FormLabel,
   Input,
   InputGroup,
-  HStack,
   InputRightElement,
   Stack,
   Button,
@@ -34,6 +33,8 @@ export default function LoginCard() {
     password: "",
   });
   const showToast = useShowToast();
+
+  // Handle user login request
   const handleLogin = async () => {
     setLoading(true);
     try {
@@ -94,6 +95,7 @@ export default function LoginCard() {
             <FormControl isRequired>
               <FormLabel>Password</FormLabel>
               <InputGroup>
+                {/* Render the password input field */}
                 <Input
                   type={showPassword ? "text" : "password"}
                   value={inputs.password}
@@ -105,6 +107,7 @@ export default function LoginCard() {
                   }
                 />
                 <InputRightElement h={"full"}>
+                  {/* Render the show/hide password button */}
                   <Button
                     variant={"ghost"}
                     onClick={() =>
@@ -117,6 +120,7 @@ export default function LoginCard() {
               </InputGroup>
             </FormControl>
             <Stack spacing={10} pt={2}>
+              {/* Render the login button */}
               <Button
                 loadingText="Submitting"
                 size="lg"
@@ -132,6 +136,7 @@ export default function LoginCard() {
               </Button>
             </Stack>
             <Stack pt={6}>
+              {/* Render the signup link */}
               <Text align={"center"}>
                 Don't have an account?{" "}
                 <Link

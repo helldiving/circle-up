@@ -19,8 +19,6 @@ import userAtom from "../atoms/userAtom";
 import useShowToast from "../hooks/useShowToast";
 import { useRecoilState, useRecoilValue } from "recoil";
 import postsAtom from "../atoms/postsAtom";
-// import { set } from "mongoose";
-// import { set } from "mongoose";
 
 const Actions = ({ post }) => {
   const user = useRecoilValue(userAtom);
@@ -116,6 +114,8 @@ const Actions = ({ post }) => {
 
   return (
     <Flex flexDirection="column">
+      {/* Render like, comment, repost, and share actions */}
+
       <Flex gap={3} my={2} onClick={(e) => e.preventDefault()}>
         <svg
           aria-label="Like"
@@ -158,6 +158,7 @@ const Actions = ({ post }) => {
         <ShareSVG />
       </Flex>
 
+      {/* Render reply and like counts */}
       <Flex gap={2} alignItems={"center"}>
         <Text color={"gray.light"} fontSize="sm">
           {post.replies.length} replies
@@ -168,6 +169,7 @@ const Actions = ({ post }) => {
         </Text>
       </Flex>
 
+      {/* Render reply modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -202,6 +204,7 @@ const Actions = ({ post }) => {
 
 export default Actions;
 
+// Component for rendering the repost SVG icon
 const RepostSVG = () => {
   return (
     <svg
@@ -222,6 +225,7 @@ const RepostSVG = () => {
   );
 };
 
+// Component for rendering the share SVG icon
 const ShareSVG = () => {
   return (
     <svg

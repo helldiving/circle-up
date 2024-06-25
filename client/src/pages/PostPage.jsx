@@ -31,38 +31,52 @@ const PostPage = () => {
   const currentUser = useRecoilValue(userAtom);
   const navigate = useNavigate();
 
+  // Get the current post from the posts state (assuming it's the first post)
   const currentPost = posts[0];
 
   useEffect(() => {
     const getPost = async () => {
       setPosts([]);
       try {
+        // Send a request to fetch the post details
         const res = await fetch(`/api/posts/${pid}`);
         const data = await res.json();
+
+        // Check for errors in the response
         if (data.error) {
           showToast("Error", data.error, "error");
           return;
         }
+
+        // Update the posts state with the fetched post
         setPosts([data]);
       } catch (error) {
         showToast("Error", error.message, "error");
       }
     };
+
+    // Fetch the post details when the component mounts
     getPost();
   }, [showToast, pid, setPosts]);
 
   const handleDeletePost = async () => {
+    // Confirm with the user before deleting the post
     try {
       if (!window.confirm("Are you sure you want to delete this post?")) return;
 
+      // Send a request to delete the post
       const res = await fetch(`/api/posts/${currentPost._id}`, {
         method: "DELETE",
       });
       const data = await res.json();
+
+      // Check for errors in the response
       if (data.error) {
         showToast("Error", data.error, "error");
         return;
       }
+
+      // Show a success toast and navigate to the user's profile page
       showToast("Success", "Post deleted", "success");
       navigate(`/${user.username}`);
     } catch (error) {
@@ -70,6 +84,7 @@ const PostPage = () => {
     }
   };
 
+  // Render a loading spinner while the user profile is being fetched
   if (!user && loading) {
     return (
       <Flex justifyContent={"center"}>
@@ -78,6 +93,7 @@ const PostPage = () => {
     );
   }
 
+  // Check if the current post exists
   if (!currentPost) return null;
   console.log("currentPost", currentPost);
 
@@ -85,15 +101,19 @@ const PostPage = () => {
     <>
       <Flex>
         <Flex w={"full"} alignItems={"center"} gap={3}>
+          {/* Render the user avatar */}
           <Avatar src={user.profilePic} size={"md"} name="Mark Zuckerberg" />
           <Flex>
+            {/* Render the username */}
             <Text fontSize={"sm"} fontWeight={"bold"}>
               {user.username}
             </Text>
+            {/* Render the verified badge */}
             <Image src="/verified.png" w="4" h={4} ml={4} />
           </Flex>
         </Flex>
         <Flex gap={4} alignItems={"center"}>
+          {/* Render the post creation time */}
           <Text
             fontSize={"xs"}
             width={36}
@@ -103,6 +123,7 @@ const PostPage = () => {
             {formatDistanceToNow(new Date(currentPost.createdAt))} ago
           </Text>
 
+          {/* Render the delete icon if the current user is the post owner */}
           {currentUser?._id === user._id && (
             <DeleteIcon
               size={20}
@@ -113,8 +134,10 @@ const PostPage = () => {
         </Flex>
       </Flex>
 
+      {/* Render the post text */}
       <Text my={3}>{currentPost.text}</Text>
 
+      {/* Render the post image */}
       {currentPost.img && (
         <Box
           borderRadius={6}
@@ -126,12 +149,14 @@ const PostPage = () => {
         </Box>
       )}
 
+      {/* Render the post actions */}
       <Flex gap={3} my={3}>
         <Actions post={currentPost} />
       </Flex>
 
       <Divider my={4} />
 
+      {/* Render the "Get the app" section */}
       <Flex justifyContent={"space-between"}>
         <Flex gap={2} alignItems={"center"}>
           <Text fontSize={"2xl"}>👋</Text>
@@ -140,6 +165,7 @@ const PostPage = () => {
         <Button>Get</Button>
       </Flex>
 
+      {/* Render the comments */}
       <Divider my={4} />
       {currentPost.replies.map((reply) => (
         <Comment

@@ -13,7 +13,6 @@ import {
   Text,
   useColorModeValue,
   Link,
-  useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
@@ -35,6 +34,7 @@ export default function SignupCard() {
   const showToast = useShowToast();
   const setUser = useSetRecoilState(userAtom);
 
+  // Handle user signup request
   const handleSignup = async () => {
     try {
       const res = await fetch("/api/users/signup", {
@@ -79,6 +79,7 @@ export default function SignupCard() {
               <Box>
                 <FormControl isRequired>
                   <FormLabel>Full name</FormLabel>
+                  {/* Render full name input field */}
                   <Input
                     type="text"
                     onChange={(e) =>
@@ -91,6 +92,7 @@ export default function SignupCard() {
               <Box>
                 <FormControl isRequired>
                   <FormLabel>Username</FormLabel>
+                  {/* Render username input field */}
                   <Input
                     type="text"
                     onChange={(e) =>
@@ -114,6 +116,7 @@ export default function SignupCard() {
             <FormControl isRequired>
               <FormLabel>Password</FormLabel>
               <InputGroup>
+                {/* Render password input field */}
                 <Input
                   type={showPassword ? "text" : "password"}
                   onChange={(e) =>
@@ -122,6 +125,7 @@ export default function SignupCard() {
                   value={inputs.password}
                 />
                 <InputRightElement h={"full"}>
+                  {/* Render show/hide password button */}
                   <Button
                     variant={"ghost"}
                     onClick={() =>
@@ -134,6 +138,7 @@ export default function SignupCard() {
               </InputGroup>
             </FormControl>
             <Stack spacing={10} pt={2}>
+              {/* Render signup button */}
               <Button
                 loadingText="Submitting"
                 size="lg"
@@ -148,6 +153,7 @@ export default function SignupCard() {
               </Button>
             </Stack>
             <Stack pt={6}>
+              {/* Render login link */}
               <Text align={"center"}>
                 Already a user?{" "}
                 <Link color={"blue.400"} onClick={() => setAuthScreen("login")}>

@@ -1,10 +1,10 @@
-// In useShowToast.js
 import { useToast } from "@chakra-ui/react";
 import { useCallback } from "react";
 
 const useShowToast = () => {
   const toast = useToast();
 
+  // Memoize the showToast function to avoid unnecessary re-renders
   const showToast = useCallback(
     (title, description, status) => {
       toast({

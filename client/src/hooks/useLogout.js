@@ -8,6 +8,7 @@ const useLogout = () => {
 
   const logout = async () => {
     try {
+      // Send a request to logout the user
       const res = await fetch("/api/users/logout", {
         method: "POST",
         headers: {
@@ -16,12 +17,14 @@ const useLogout = () => {
       });
       const data = await res.json();
 
+      // Check for errors in the response
       if (data.error) {
         showToast("Error", data.error, "error");
         return;
       }
 
-      localStorage.removeItem("user-info"); // if error will clear local storage
+      // Clear the user info from local storage and state
+      localStorage.removeItem("user-info"); // if error -> will clear local storage
       setUser(null); // and will clear state
     } catch (error) {
       showToast("Error", error, "error");

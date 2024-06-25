@@ -1,3 +1,5 @@
+/*  */
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
@@ -28,7 +30,7 @@ const colors = {
   },
 };
 
-// passes above into theme which we then pass into ChakraProvider
+// passes above into theme which is then passed into ChakraProvider
 const theme = extendTheme({ config, styles, colors });
 
 ReactDOM.createRoot(document.getElementById("root")).render(

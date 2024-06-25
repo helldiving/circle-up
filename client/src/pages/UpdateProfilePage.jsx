@@ -8,11 +8,8 @@ import {
   Stack,
   useColorModeValue,
   Avatar,
-  AvatarBadge,
-  IconButton,
   Center,
 } from "@chakra-ui/react";
-import { SmallCloseIcon } from "@chakra-ui/icons";
 import { useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import userAtom from "../atoms/userAtom";
@@ -22,6 +19,7 @@ import useShowToast from "../hooks/useShowToast";
 export default function UpdateProfilePage() {
   const [user, setUser] = useRecoilState(userAtom);
   const [inputs, setInputs] = useState({
+    // State to store the input values
     // when adding occupation and location, add here after userController
     name: user.name,
     username: user.username,
@@ -30,7 +28,10 @@ export default function UpdateProfilePage() {
     password: "",
   });
 
+  // Ref to store the file input reference
   const fileRef = useRef(null);
+
+  // State to track if the update request is in progress
   const [updating, setUpdating] = useState(false);
 
   const showToast = useShowToast();
@@ -38,10 +39,13 @@ export default function UpdateProfilePage() {
   const { handleImageChange, imgUrl } = usePreviewImg();
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if an update is already in progress
     if (updating) return;
     setUpdating(true);
 
     try {
+      // Send a request to update the user profile
       const res = await fetch(`/api/users/update/${user._id}`, {
         method: "PUT",
         headers: {
@@ -50,10 +54,14 @@ export default function UpdateProfilePage() {
         body: JSON.stringify({ ...inputs, profilePic: imgUrl }),
       });
       const data = await res.json(); // updated user object/data
+
+      // Check for errors in the response
       if (data.error) {
         showToast("Error", data.error, "error");
         return;
       }
+
+      // Show a success toast and update the user state and local storage
       showToast("Success", "Profile updated successfully", "success");
       setUser(data);
       localStorage.setItem("user-info", JSON.stringify(data));
@@ -83,6 +91,7 @@ export default function UpdateProfilePage() {
           <FormControl id="userName">
             <Stack direction={["column", "row"]} spacing={6}>
               <Center>
+                {/* Render the user avatar */}
                 <Avatar
                   size="xl"
                   boxShadow={"md"}
@@ -90,9 +99,11 @@ export default function UpdateProfilePage() {
                 />
               </Center>
               <Center w="full">
+                {/* Render the change avatar button */}
                 <Button w="full" onClick={() => fileRef.current.click()}>
                   Change Avatar
                 </Button>
+                {/* Render the hidden file input */}
                 <Input
                   type="file"
                   hidden
@@ -104,6 +115,7 @@ export default function UpdateProfilePage() {
           </FormControl>
           <FormControl>
             <FormLabel>Name</FormLabel>
+            {/* Render the name input field */}
             <Input
               placeholder="Little Amigo"
               value={inputs.name}
@@ -114,6 +126,7 @@ export default function UpdateProfilePage() {
           </FormControl>
           <FormControl>
             <FormLabel>Username</FormLabel>
+            {/* Render the username input field */}
             <Input
               placeholder="lb123"
               value={inputs.username}
@@ -126,6 +139,7 @@ export default function UpdateProfilePage() {
           </FormControl>
           <FormControl>
             <FormLabel>Email address</FormLabel>
+            {/* Render the email input field */}
             <Input
               placeholder="your-email@example.com"
               value={inputs.email}
@@ -136,6 +150,7 @@ export default function UpdateProfilePage() {
           </FormControl>
           <FormControl>
             <FormLabel>Bio</FormLabel>
+            {/* Render the bio input field */}
             <Input
               placeholder="What's to know?"
               value={inputs.bio}
@@ -146,6 +161,7 @@ export default function UpdateProfilePage() {
           </FormControl>
           <FormControl>
             <FormLabel>Password</FormLabel>
+            {/* Render the password input field */}
             <Input
               placeholder="password"
               value={inputs.password}
@@ -157,6 +173,7 @@ export default function UpdateProfilePage() {
             />
           </FormControl>
           <Stack spacing={6} direction={["column", "row"]}>
+            {/* Render the cancel button */}
             <Button
               bg={"red.400"}
               color={"white"}
@@ -167,6 +184,7 @@ export default function UpdateProfilePage() {
             >
               Cancel
             </Button>
+            {/* Render the submit button */}
             <Button
               bg={"green.400"}
               color={"white"}

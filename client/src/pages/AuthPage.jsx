@@ -4,11 +4,11 @@ import SignupCard from "../components/SignupCard";
 import authScreenAtom from "../atoms/authAtom";
 
 const AuthPage = () => {
+  // Get the current authentication screen state from the authScreenAtom
   const authScreenState = useRecoilValue(authScreenAtom);
   console.log(authScreenState);
 
-  // const [value, setValue] = useState("login");
-  // useSetRecoilState(authSCreenAtom);
+  // Render the appropriate authentication card based on the authScreenState
   return <>{authScreenState === "login" ? <LoginCard /> : <SignupCard />}</>;
 };
 

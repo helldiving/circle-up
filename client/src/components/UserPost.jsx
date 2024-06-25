@@ -10,9 +10,11 @@ const UserPost = ({ postImg, postTitle, likes, replies }) => {
     <Link to={"/sandsniffer/post/1"}>
       <Flex gap={3} mb={4} py={5}>
         <Flex flexDirection={"column"} alignItems={"center"}>
+          {/* Render user avatar */}
           <Avatar size="md" name="Paul Atreides" src="/paul-avatar.png" />
           <Box w="1px" h={"full"} bg="gray.light" my={2}></Box>
           <Box position={"relative"} w={"full"}>
+            {/* Render reply avatars */}
             <Avatar
               size="xs"
               name="FridgeUP"
@@ -45,12 +47,15 @@ const UserPost = ({ postImg, postTitle, likes, replies }) => {
         <Flex flex={1} flexDirection={"column"} gap={2}>
           <Flex justifyContent={"space-between"} w={"full"}>
             <Flex w={"full"} alignItems={"center"}>
+              {/* Render username */}
               <Text fontSize={"sm"} fontWeight={"bold"}>
                 sandsniffer
               </Text>
+              {/* Render verified badge */}
               <Image src="/verified.png" w={4} h={4} ml={1} />
             </Flex>
             <Flex gap={4} alignItems={"center"}>
+              {/* Render post creation time */}
               <Text fontStyle={"sm"} color={"gray.light"}>
                 1d
               </Text>
@@ -58,7 +63,9 @@ const UserPost = ({ postImg, postTitle, likes, replies }) => {
             </Flex>
           </Flex>
 
+          {/* Render post title */}
           <Text fontSize={"sm"}>{postTitle}</Text>
+          {/* Render post image */}
           {postImg && (
             <Box
               borderRadius={6}
@@ -70,10 +77,12 @@ const UserPost = ({ postImg, postTitle, likes, replies }) => {
             </Box>
           )}
 
+          {/* Render post actions */}
           <Flex gap={3} my={1}>
             <Actions liked={liked} setLiked={setLiked} />
           </Flex>
 
+          {/* Render reply and like counts */}
           <Flex gap={2} alignItems={"center"}>
             <Text color={"gray.light"} fontSize="sm">
               {replies} replies

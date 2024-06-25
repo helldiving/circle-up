@@ -3,12 +3,15 @@ import jwt from "jsonwebtoken";
 
 const protectRoute = async (req, res, next) => {
   try {
+    // Get the JWT token from the cookies
     const token = req.cookies.jwt;
 
     if (!token) return res.status(401).json({ message: "Unauthorized" });
 
+    // Verify the token and extract the user ID from the payload
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+    // Find the user by the extracted user ID
     const user = await User.findById(decoded.userId).select("-password");
 
     // we take token -> if no token -> no one is logged in -> "unauthorized"
@@ -16,6 +19,7 @@ const protectRoute = async (req, res, next) => {
 
     // userId is the payload from generateTokenandSetCookie
 
+    // Attach the user object to the request for further use
     req.user = user;
 
     next();

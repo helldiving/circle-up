@@ -11,25 +11,36 @@ import UpdateProfilePage from "./pages/UpdateProfilePage.jsx";
 import CreatePost from "./components/CreatePost.jsx";
 
 function App() {
+  // Get the user state from the userAtom
   const user = useRecoilValue(userAtom);
   console.log(user);
+
   return (
     <Container maxW="620px">
+      {/* Render the header component */}
       <Header />
+
+      {/* Define the routes */}
       <Routes>
+        {/* Home page route */}
         <Route
           path="/"
           element={user ? <HomePage /> : <Navigate to="/auth" />}
         />
+
+        {/* Authentication page route */}
         <Route
           path="/auth"
           element={!user ? <AuthPage /> : <Navigate to="/" />}
         />
+
+        {/* Update profile page route */}
         <Route
           path="/update"
           element={user ? <UpdateProfilePage /> : <Navigate to="/auth" />}
         />
 
+        {/* User page route */}
         <Route
           path="/:username"
           element={
@@ -43,6 +54,8 @@ function App() {
             )
           }
         />
+
+        {/* Post page route */}
         <Route path="/:username/post/:pid" element={<PostPage />} />
       </Routes>
     </Container>

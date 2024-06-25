@@ -19,6 +19,7 @@ const Post = ({ post, postedBy }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Fetch user data based on postedBy
     const getUser = async () => {
       try {
         // Check if postedBy is already an object with the necessary data
@@ -74,6 +75,8 @@ const Post = ({ post, postedBy }) => {
     getUser();
   }, [postedBy, showToast]);
 */
+
+  // Handle deleting a post
   const handleDeletePost = async (e) => {
     try {
       e.preventDefault();
@@ -99,6 +102,7 @@ const Post = ({ post, postedBy }) => {
   return (
     <Link to={`/${user.username}/post/${post._id}`}>
       <Flex gap={3} mb={4} py={5}>
+        {/* Render user avatar and reply avatars */}
         <Flex flexDirection={"column"} alignItems={"center"}>
           <Avatar
             size="md"
@@ -151,6 +155,7 @@ const Post = ({ post, postedBy }) => {
         <Flex flex={1} flexDirection={"column"} gap={2}>
           <Flex justifyContent={"space-between"} w={"full"}>
             <Flex w={"full"} alignItems={"center"}>
+              {/* Render username */}
               <Text
                 fontSize={"sm"}
                 fontWeight={"bold"}
@@ -161,9 +166,11 @@ const Post = ({ post, postedBy }) => {
               >
                 {user?.username}
               </Text>
+              {/* Render verified badge */}
               <Image src="/verified.png" w={4} h={4} ml={1} />
             </Flex>
             <Flex gap={4} alignItems={"center"}>
+              {/* Render post creation time */}
               <Text
                 fontSize={"xs"}
                 width={36}
@@ -172,13 +179,16 @@ const Post = ({ post, postedBy }) => {
               >
                 {formatDistanceToNow(new Date(post.createdAt))} ago
               </Text>
+              {/* Render delete icon if the current user is the post owner */}
               {currentUser?._id === user._id && (
                 <DeleteIcon size={20} onClick={handleDeletePost} />
               )}
             </Flex>
           </Flex>
 
+          {/* Render post text */}
           <Text fontSize={"sm"}>{post.text}</Text>
+          {/* Render post image */}
           {post.img && (
             <Box
               borderRadius={6}
@@ -190,6 +200,7 @@ const Post = ({ post, postedBy }) => {
             </Box>
           )}
 
+          {/* Render post actions */}
           <Flex gap={3} my={1}>
             <Actions post={post} />
           </Flex>
