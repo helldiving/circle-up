@@ -78,9 +78,11 @@ const CreatePost = () => {
         return;
       }
       showToast("Success", "Post created successfully", "success");
+      // If on user's own profile page, add new post to the top of the list
       if (username === user.username) {
         setPosts([data, ...posts]);
       }
+      // Add new post to the global posts state
       setPosts([data, ...posts]);
       onClose();
       setPostText(""); // reset text
@@ -88,6 +90,7 @@ const CreatePost = () => {
     } catch (error) {
       showToast("Error", error, "error");
     } finally {
+      // Reset updating state regardless of outcome
       setLoading(false);
     }
   };

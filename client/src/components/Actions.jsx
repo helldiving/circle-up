@@ -32,15 +32,18 @@ const Actions = ({ post }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleLikeAndUnlike = async () => {
+    // Prevent unauthenticated users from liking posts
     if (!user)
       return showToast(
         "Error",
         "You must be logged in to like a post",
         "error"
       );
+    // Prevent multiple simultaneous like/unlike requests
     if (isLiking) return;
     setIsLiking(true);
     try {
+      // Send like/unlike request to the server
       const res = await fetch("/api/posts/like/" + post._id, {
         method: "PUT",
         headers: {
@@ -51,7 +54,7 @@ const Actions = ({ post }) => {
       if (data.error) return showToast("Error", data.error, "error");
 
       if (!liked) {
-        // add the id of the current user to post.likes array
+        // If post wasn't liked, add the id of the current user to post.likes array
         const updatedPosts = posts.map((p) => {
           if (p._id === post._id) {
             return { ...p, likes: [...p.likes, user._id] };
@@ -60,7 +63,7 @@ const Actions = ({ post }) => {
         });
         setPosts(updatedPosts);
       } else {
-        // remove the id of the current user from post.likes array
+        // If post was liked, remove the id of the current user from post.likes array
         const updatedPosts = posts.map((p) => {
           if (p._id === post._id) {
             return { ...p, likes: p.likes.filter((id) => id !== user._id) };
@@ -70,10 +73,12 @@ const Actions = ({ post }) => {
         setPosts(updatedPosts);
       }
 
+      // Toggle liked state
       setLiked(!liked);
     } catch (error) {
       showToast("Error", error.message, "error");
     } finally {
+      // Reset isLiking state regardless of outcome
       setIsLiking(false);
     }
   };
