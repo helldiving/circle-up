@@ -39,6 +39,12 @@ const postSchema = mongoose.Schema(
         },
       },
     ],
+    taggedUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     timestamps: true,

@@ -11,12 +11,13 @@ import { DeleteIcon } from "@chakra-ui/icons";
 import { useRecoilState, useRecoilValue } from "recoil";
 import postsAtom from "../atoms/postsAtom";
 
-const Post = ({ post, postedBy }) => {
+const Post = ({ post, postedBy, currentUser }) => {
   const [user, setUser] = useState(null);
   const showToast = useShowToast();
-  const currentUser = useRecoilValue(userAtom);
   const [posts, setPosts] = useRecoilState(postsAtom);
   const navigate = useNavigate();
+  const isTagged =
+    post.taggedUsers && post.taggedUsers.includes(currentUser._id);
 
   useEffect(() => {
     // Fetch user data based on postedBy
@@ -185,6 +186,13 @@ const Post = ({ post, postedBy }) => {
               )}
             </Flex>
           </Flex>
+
+          {/* Add the tagged indicator here */}
+          {isTagged && (
+            <Text fontSize="xs" color="blue.500" fontWeight="bold">
+              You were tagged in this post
+            </Text>
+          )}
 
           {/* Render post text */}
           <Text fontSize={"sm"}>{post.text}</Text>

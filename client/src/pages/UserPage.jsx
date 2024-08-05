@@ -34,9 +34,12 @@ const UserPage = () => {
         const res = await fetch(`/api/posts/user/${username}`);
         const data = await res.json();
         console.log(data);
-
-        // Update the posts state with the fetched posts
-        setPosts(data);
+        if (Array.isArray(data)) {
+          setPosts(data);
+        } else {
+          console.error("Received non-array data:", data);
+          setPosts([]);
+        }
       } catch (error) {
         showToast("Error", error.message, "error");
         setPosts([]);

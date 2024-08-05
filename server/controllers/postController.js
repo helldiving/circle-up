@@ -4,7 +4,7 @@ import { v2 as cloudinary } from "cloudinary";
 
 const createPost = async (req, res) => {
   try {
-    const { postedBy, text } = req.body;
+    const { postedBy, text, taggedUsers } = req.body;
     let { img } = req.body;
 
     // Check if postedBy and text fields are provided
@@ -40,7 +40,7 @@ const createPost = async (req, res) => {
     }
 
     // Create a new post
-    const newPost = new Post({ postedBy, text, img });
+    const newPost = new Post({ postedBy, text, img, taggedUsers });
     await newPost.save();
 
     res.status(201).json(newPost);
@@ -201,7 +201,10 @@ const getUserPosts = async (req, res) => {
     }
 
     // Find all posts posted by the user and sort them in descending order
-    const posts = await Post.find({ postedBy: user._id }).sort({
+    const posts = await Post.find(
+      { postedBy: user._id },
+      { taggedUsers: user._id }
+    ).sort({
       createdAt: -1,
     });
 
