@@ -1,5 +1,6 @@
 import { AddIcon } from "@chakra-ui/icons";
 import {
+  Box,
   Button,
   CloseButton,
   Flex,
@@ -18,7 +19,7 @@ import {
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import usePreviewImg from "../hooks/usePreviewImg";
 import { BsFillImageFill } from "react-icons/bs";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -27,6 +28,7 @@ import useShowToast from "../hooks/useShowToast";
 
 import { useParams } from "react-router-dom";
 import postsAtom from "../atoms/postsAtom";
+import TagInput from "./TagInput";
 
 const MAX_CHAR = 500;
 
@@ -41,10 +43,47 @@ const CreatePost = () => {
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useRecoilState(postsAtom);
   const { username } = useParams();
+  const [taggedUsers, setTaggedUsers] = useState([]);
+  const [existingUsers, setExistingUsers] = useState([]);
+  const [showUserList, setShowUserList] = useState(false);
+  const [matchingUsers, setMatchingUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        console.log("Fetching users...");
+        const response = await fetch("/api/users/all");
+        console.log("Response status:", response.status);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("Fetched data:", data);
+        setExistingUsers(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        setExistingUsers([]);
+      }
+    };
+    fetchUsers();
+  }, []);
 
   // Handle text change in the post input
   const handleTextChange = (e) => {
     const inputText = e.target.value;
+    setPostText(inputText);
+
+    const lastWord = inputText.split(" ").pop();
+    if (lastWord.startsWith("@") && lastWord.length > 1) {
+      const searchTerm = lastWord.slice(1).toLowerCase();
+      const matches = existingUsers.filter((user) =>
+        user.username.toLowerCase().startsWith(searchTerm)
+      );
+      setMatchingUsers(matches);
+      setShowUserList(true);
+    } else {
+      setShowUserList(false);
+    }
 
     if (inputText.length > MAX_CHAR) {
       const truncatedText = inputText.slice(0, MAX_CHAR);
@@ -56,10 +95,28 @@ const CreatePost = () => {
     }
   };
 
+  const handleUserSelect = (username, userId) => {
+    const words = postText.split(" ");
+    words[words.length - 1] = `@${username} `;
+    const newText = words.join(" ");
+    setPostText(newText);
+    setShowUserList(false);
+    setTaggedUsers([...taggedUsers, { username, _id: userId }]);
+  };
+
   // Handle creating a new post
   const handleCreatePost = async () => {
     setLoading(true);
     try {
+      const taggedUserIds = taggedUsers
+        .map((username) => {
+          const user = existingUsers.find((u) => u.username === username);
+          return user ? user._id : null;
+        })
+        .filter((id) => id !== null);
+
+      console.log("Tagged user IDs:", taggedUserIds);
+
       const res = await fetch("/api/posts/create", {
         method: "POST",
         headers: {
@@ -69,6 +126,7 @@ const CreatePost = () => {
           postedBy: user._id,
           text: postText,
           img: imgUrl,
+          taggedUsers: taggedUserIds,
         }),
       });
 
@@ -124,6 +182,21 @@ const CreatePost = () => {
                 onChange={handleTextChange}
                 value={postText}
               />
+              {showUserList && (
+                <Box mt={2} boxShadow="md" borderWidth="1px" borderRadius="md">
+                  {matchingUsers.map((user) => (
+                    <Box
+                      key={user._id}
+                      p={2}
+                      _hover={{ bg: "gray.100" }}
+                      cursor="pointer"
+                      onClick={() => handleUserSelect(user.username, user._id)}
+                    >
+                      {user.username}
+                    </Box>
+                  ))}
+                </Box>
+              )}
               {/* Render the remaining character count */}
               <Text
                 fontSize="xs"

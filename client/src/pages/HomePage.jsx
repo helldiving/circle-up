@@ -9,6 +9,7 @@ const HomePage = () => {
   const [posts, setPosts] = useRecoilState(postsAtom);
   const [loading, setLoading] = useState(true);
   const showToast = useShowToast();
+
   useEffect(() => {
     const getFeedPosts = async () => {
       setLoading(true);
@@ -37,6 +38,15 @@ const HomePage = () => {
     // Fetch the feed posts when the component mounts
     getFeedPosts();
   }, [showToast, setPosts]);
+
+  // Loading icon
+  if (loading) {
+    return (
+      <Flex justify="center" align="center" height="100vh">
+        <Spinner size="xl" />
+      </Flex>
+    );
+  }
 
   return (
     <Flex gap="10" alignItems={"flex-start"}>

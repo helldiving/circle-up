@@ -6,6 +6,7 @@ import {
   followUnFollowUser,
   updateUser,
   getUserProfile,
+  getUsers,
 } from "../controllers/userController.js";
 import protectRoute from "../middlewares/protectRoute.js";
 
@@ -17,5 +18,6 @@ router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.post("/follow/:id", protectRoute, followUnFollowUser); // toggles state(follow/unfollow) //:id value is dynamic
 router.put("/update/:id", protectRoute, updateUser);
+router.get("/all", getUsers);
 
 export default router;

@@ -222,6 +222,19 @@ const updateUser = async (req, res) => {
   }
 };
 
+// For tagged users
+const getUsers = async (req, res) => {
+  console.log("getUsers function called");
+  try {
+    const users = await User.find({}, "username profilePic");
+    console.log("Users found:", users);
+    res.json(users);
+  } catch (error) {
+    console.error("Error in getUsers:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export {
   signupUser,
   loginUser,
@@ -229,4 +242,5 @@ export {
   followUnFollowUser,
   updateUser,
   getUserProfile,
+  getUsers,
 };

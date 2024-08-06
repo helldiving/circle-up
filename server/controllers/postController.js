@@ -39,9 +39,23 @@ const createPost = async (req, res) => {
       img = uploadedResponse.secure_url;
     }
 
+    if (taggedUsers && !Array.isArray(taggedUsers)) {
+      return res.status(400).json({ error: "taggedUsers must be an array" });
+    }
+
+    console.log("Creating new post:", {
+      postedBy: newPost.postedBy,
+      text: newPost.text,
+      taggedUsers: newPost.taggedUsers,
+    });
+
     // Create a new post
     const newPost = new Post({ postedBy, text, img, taggedUsers });
+
     await newPost.save();
+
+    await newPost.populate("postedBy", "_id username profilePic");
+    await newPost.populate("taggedUsers", "_id username");
 
     res.status(201).json(newPost);
   } catch (err) {
@@ -194,22 +208,33 @@ const getFeedPosts = async (req, res) => {
 const getUserPosts = async (req, res) => {
   const { username } = req.params;
   try {
-    // Find the user by their username
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Find all posts posted by the user and sort them in descending order
-    const posts = await Post.find(
-      { postedBy: user._id },
-      { taggedUsers: user._id }
-    ).sort({
-      createdAt: -1,
-    });
+    console.log("Fetching posts for user:", user._id);
+
+    const posts = await Post.find({
+      $or: [{ postedBy: user._id }, { taggedUsers: user._id }],
+    })
+      .populate("postedBy", "_id username profilePic")
+      .populate("taggedUsers", "_id username")
+      .sort({ createdAt: -1 });
+
+    console.log("Posts found:", posts.length);
+    console.log(
+      "Posts details:",
+      posts.map((p) => ({
+        id: p._id,
+        postedBy: p.postedBy.username,
+        taggedUsers: p.taggedUsers.map((u) => u.username),
+      }))
+    );
 
     res.status(200).json(posts);
   } catch (error) {
+    console.error("Error in getUserPosts:", error);
     res.status(500).json({ error: error.message });
   }
 };

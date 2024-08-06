@@ -11,42 +11,55 @@ import { DeleteIcon } from "@chakra-ui/icons";
 import { useRecoilState, useRecoilValue } from "recoil";
 import postsAtom from "../atoms/postsAtom";
 
-const Post = ({ post, postedBy, currentUser }) => {
+const Post = ({ post, postedBy }) => {
+  const currentUser = useRecoilValue(userAtom);
   const [user, setUser] = useState(null);
   const showToast = useShowToast();
   const [posts, setPosts] = useRecoilState(postsAtom);
   const navigate = useNavigate();
-  const isTagged =
-    post.taggedUsers && post.taggedUsers.includes(currentUser._id);
 
   useEffect(() => {
-    // Fetch user data based on postedBy
     const getUser = async () => {
+      if (!postedBy) {
+        console.error("postedBy is undefined");
+        return;
+      }
       try {
-        // Check if postedBy is already an object with the necessary data
         if (typeof postedBy === "object" && postedBy._id) {
           setUser(postedBy);
-          return;
+        } else {
+          const userId = typeof postedBy === "string" ? postedBy : postedBy._id;
+          const res = await fetch(`/api/users/profile/${userId}`);
+          const data = await res.json();
+          if (data.error) {
+            console.error("Error fetching user:", data.error);
+          } else {
+            setUser(data);
+          }
         }
-
-        // If not, fetch the user data
-        const userId = typeof postedBy === "object" ? postedBy._id : postedBy;
-        const res = await fetch(`/api/users/profile/${userId}`);
-        const data = await res.json();
-
-        if (data.error) {
-          showToast("Error", data.error, "error");
-          return;
-        }
-        setUser(data);
       } catch (error) {
-        showToast("Error", error.message, "error");
-        setUser(null);
+        console.error("Error in getUser:", error);
       }
     };
 
     getUser();
-  }, [postedBy, showToast]);
+  }, [postedBy]);
+
+  if (!post || !postedBy) {
+    console.log("Post or postedBy is null:", { post, postedBy });
+    return null;
+  }
+
+  if (!user) {
+    console.log("User is null, post:", post);
+    return null;
+  }
+
+  const replies = post.replies || [];
+
+  const isTagged =
+    post.taggedUsers &&
+    post.taggedUsers.some((user) => user._id === currentUser._id);
 
   /* // before: home feed from following only
 const Post = ({ post, postedBy }) => {
@@ -120,7 +133,7 @@ const Post = ({ post, postedBy }) => {
             {post.replies[0] && (
               <Avatar
                 size="xs"
-                name="FridgeUP"
+                name="Reply"
                 src={post.replies[0].userProfilePic}
                 position={"absolute"}
                 top={"0px"}
@@ -131,7 +144,7 @@ const Post = ({ post, postedBy }) => {
             {post.replies[1] && (
               <Avatar
                 size="xs"
-                name="FridgeUP"
+                name="Reply"
                 src={post.replies[1].userProfilePic}
                 position={"absolute"}
                 bottom={"0px"}
@@ -143,7 +156,7 @@ const Post = ({ post, postedBy }) => {
             {post.replies[2] && (
               <Avatar
                 size="xs"
-                name="FridgeUP"
+                name="Reply"
                 src={post.replies[2].userProfilePic}
                 position={"absolute"}
                 bottom={"0px"}
@@ -191,6 +204,11 @@ const Post = ({ post, postedBy }) => {
           {isTagged && (
             <Text fontSize="xs" color="blue.500" fontWeight="bold">
               You were tagged in this post
+            </Text>
+          )}
+          {isTagged && post.postedBy._id !== currentUser._id && (
+            <Text fontSize="xs" color="gray.500">
+              Tagged by @{post.postedBy.username}
             </Text>
           )}
 

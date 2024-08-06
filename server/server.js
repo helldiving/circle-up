@@ -30,6 +30,15 @@ app.use(cookieParser()); // Parse cookies
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
+app.get("/api/test", (req, res) => {
+  res.json({ message: "Server is running" });
+});
+
 // Start the server
 app.listen(PORT, () =>
   console.log(`Server started at http://localhost:${PORT}`)

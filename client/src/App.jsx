@@ -9,6 +9,7 @@ import { useRecoilValue } from "recoil";
 import userAtom from "./atoms/userAtom.js";
 import UpdateProfilePage from "./pages/UpdateProfilePage.jsx";
 import CreatePost from "./components/CreatePost.jsx";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
   // Get the user state from the userAtom
@@ -16,49 +17,51 @@ function App() {
   console.log(user);
 
   return (
-    <Container maxW="620px">
-      {/* Render the header component */}
-      <Header />
+    <ErrorBoundary>
+      <Container maxW="620px">
+        {/* Render the header component */}
+        <Header />
 
-      {/* Define the routes */}
-      <Routes>
-        {/* Home page route */}
-        <Route
-          path="/"
-          element={user ? <HomePage /> : <Navigate to="/auth" />}
-        />
+        {/* Define the routes */}
+        <Routes>
+          {/* Home page route */}
+          <Route
+            path="/"
+            element={user ? <HomePage /> : <Navigate to="/auth" />}
+          />
 
-        {/* Authentication page route */}
-        <Route
-          path="/auth"
-          element={!user ? <AuthPage /> : <Navigate to="/" />}
-        />
+          {/* Authentication page route */}
+          <Route
+            path="/auth"
+            element={!user ? <AuthPage /> : <Navigate to="/" />}
+          />
 
-        {/* Update profile page route */}
-        <Route
-          path="/update"
-          element={user ? <UpdateProfilePage /> : <Navigate to="/auth" />}
-        />
+          {/* Update profile page route */}
+          <Route
+            path="/update"
+            element={user ? <UpdateProfilePage /> : <Navigate to="/auth" />}
+          />
 
-        {/* User page route */}
-        <Route
-          path="/:username"
-          element={
-            user ? (
-              <>
+          {/* User page route - consider removing if CreatePost is already rendering its own button? */}
+          <Route
+            path="/:username"
+            element={
+              user ? (
+                <>
+                  <UserPage />
+                  <CreatePost />
+                </>
+              ) : (
                 <UserPage />
-                <CreatePost />
-              </>
-            ) : (
-              <UserPage />
-            )
-          }
-        />
+              )
+            }
+          />
 
-        {/* Post page route */}
-        <Route path="/:username/post/:pid" element={<PostPage />} />
-      </Routes>
-    </Container>
+          {/* Post page route */}
+          <Route path="/:username/post/:pid" element={<PostPage />} />
+        </Routes>
+      </Container>
+    </ErrorBoundary>
   );
 }
 
