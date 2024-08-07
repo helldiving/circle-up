@@ -45,8 +45,12 @@ const UserHeader = ({ user }) => {
               fontSize={"xs"}
               bg={"gray.dark"}
               color={"gray.light"}
-              p={1}
+              px={1}
+              alignItems="25%"
               borderRadius={"full"}
+              display="flex"
+              justifyContent="center"
+              height="20px"
             >
               circleup.live
             </Text>
@@ -143,7 +147,7 @@ const UserHeader = ({ user }) => {
           pb="3"
           cursor={"pointer"}
         >
-          <Text fontWeight={"bold"}> Replies</Text>
+          <Text fontWeight={"bold"}> Replies </Text>
         </Flex>
       </Flex>
     </VStack>

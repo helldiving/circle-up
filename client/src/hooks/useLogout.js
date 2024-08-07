@@ -1,10 +1,14 @@
 import { useSetRecoilState } from "recoil";
 import userAtom from "../atoms/userAtom";
+import postsAtom from "../atoms/postsAtom";
 import useShowToast from "./useShowToast";
+import { useNavigate } from "react-router-dom";
 
 const useLogout = () => {
   const setUser = useSetRecoilState(userAtom);
+  const setPosts = useSetRecoilState(postsAtom);
   const showToast = useShowToast();
+  const navigate = useNavigate();
 
   const logout = async () => {
     try {
@@ -24,10 +28,12 @@ const useLogout = () => {
       }
 
       // Clear the user info from local storage and state
-      localStorage.removeItem("user-info"); // if error -> will clear local storage
-      setUser(null); // and will clear state
+      localStorage.removeItem("user-info");
+      setUser(null);
+      setPosts([]);
+      navigate("/auth"); // navigate back to login page
     } catch (error) {
-      showToast("Error", error, "error");
+      showToast("Error", error.message, "error");
     }
   };
   return logout;

@@ -154,16 +154,16 @@ const PostPage = () => {
         <Actions post={currentPost} />
       </Flex>
 
-      <Divider my={4} />
+      {/* <Divider my={4} /> */}
 
-      {/* Render the "Get the app" section */}
+      {/* Render the "Get the app" section
       <Flex justifyContent={"space-between"}>
         <Flex gap={2} alignItems={"center"}>
           <Text fontSize={"2xl"}>👋</Text>
-          <Text color={"gray.light"}>Get the app to like, reply and post.</Text>
+          <Text color={"gray.light"}>Share your thoughts...</Text>
         </Flex>
-        <Button>Get</Button>
-      </Flex>
+        {/* <Button>Get</Button>
+      </Flex> */}
 
       {/* Render the comments */}
       <Divider my={4} />

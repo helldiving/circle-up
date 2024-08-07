@@ -114,7 +114,7 @@ const UserPage = () => {
       {/* Render the user's posts by passing props to Post component */}
       {posts.map((post) => {
         console.log("Full post object:", post);
-        if (!post.postedBy) {
+        if (!post || !post.postedBy) {
           console.log("Skipping post due to missing postedBy:", post);
           return null;
         }
@@ -122,11 +122,11 @@ const UserPage = () => {
           <Box key={post._id}>
             {post.postedBy._id === user._id ? (
               <Text fontSize="sm" color="gray.500">
-                Your post
+                {/* Your post */}
               </Text>
             ) : (
-              <Text fontSize="sm" color="gray.500">
-                You were tagged in this post by @{post.postedBy.username}
+              <Text fontSize="sm" color="blue.500">
+                {/* You were tagged in this post by @{post.postedBy.username}  */}
               </Text>
             )}
             <Post post={post} postedBy={post.postedBy} />

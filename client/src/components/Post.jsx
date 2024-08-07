@@ -18,6 +18,11 @@ const Post = ({ post, postedBy }) => {
   const [posts, setPosts] = useRecoilState(postsAtom);
   const navigate = useNavigate();
 
+  // null check
+  if (!post || !postedBy || !currentUser) {
+    return null; // or return a loading indicator?
+  }
+
   useEffect(() => {
     const getUser = async () => {
       if (!postedBy) {
@@ -59,6 +64,7 @@ const Post = ({ post, postedBy }) => {
 
   const isTagged =
     post.taggedUsers &&
+    currentUser &&
     post.taggedUsers.some((user) => user._id === currentUser._id);
 
   /* // before: home feed from following only

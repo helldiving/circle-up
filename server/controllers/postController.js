@@ -4,8 +4,8 @@ import { v2 as cloudinary } from "cloudinary";
 
 const createPost = async (req, res) => {
   try {
-    const { postedBy, text, taggedUsers } = req.body;
-    let { img } = req.body;
+    const { postedBy, text } = req.body;
+    let { img, taggedUsers } = req.body;
 
     // Check if postedBy and text fields are provided
     if (!postedBy || !text) {
@@ -39,15 +39,15 @@ const createPost = async (req, res) => {
       img = uploadedResponse.secure_url;
     }
 
-    if (taggedUsers && !Array.isArray(taggedUsers)) {
-      return res.status(400).json({ error: "taggedUsers must be an array" });
-    }
-
-    console.log("Creating new post:", {
-      postedBy: newPost.postedBy,
-      text: newPost.text,
-      taggedUsers: newPost.taggedUsers,
+    // Extract tagged usernames from the text
+    const mentionedUsernames = text.match(/@(\w+)/g) || [];
+    const mentionedUsers = await User.find({
+      username: { $in: mentionedUsernames.map((u) => u.slice(1)) },
     });
+
+    taggedUsers = mentionedUsers.map((user) => user._id);
+
+    console.log("Tagged user IDs:", taggedUsers);
 
     // Create a new post
     const newPost = new Post({ postedBy, text, img, taggedUsers });
@@ -56,6 +56,12 @@ const createPost = async (req, res) => {
 
     await newPost.populate("postedBy", "_id username profilePic");
     await newPost.populate("taggedUsers", "_id username");
+
+    console.log("Creating new post:", {
+      postedBy: newPost.postedBy,
+      text: newPost.text,
+      taggedUsers: newPost.taggedUsers,
+    });
 
     res.status(201).json(newPost);
   } catch (err) {
@@ -229,6 +235,7 @@ const getUserPosts = async (req, res) => {
         id: p._id,
         postedBy: p.postedBy.username,
         taggedUsers: p.taggedUsers.map((u) => u.username),
+        text: p.text.substring(0, 50) + "...",
       }))
     );
 

@@ -78,7 +78,7 @@ export default function SignupCard() {
             <HStack>
               <Box>
                 <FormControl isRequired>
-                  <FormLabel>Full name</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   {/* Render full name input field */}
                   <Input
                     type="text"
