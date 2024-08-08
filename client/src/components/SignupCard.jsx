@@ -79,7 +79,7 @@ export default function SignupCard() {
               <Box>
                 <FormControl isRequired>
                   <FormLabel>Name</FormLabel>
-                  {/* Render full name input field */}
+                  {/* Name input field */}
                   <Input
                     type="text"
                     onChange={(e) =>
@@ -92,7 +92,7 @@ export default function SignupCard() {
               <Box>
                 <FormControl isRequired>
                   <FormLabel>Username</FormLabel>
-                  {/* Render username input field */}
+                  {/* Username input field */}
                   <Input
                     type="text"
                     onChange={(e) =>
@@ -116,7 +116,7 @@ export default function SignupCard() {
             <FormControl isRequired>
               <FormLabel>Password</FormLabel>
               <InputGroup>
-                {/* Render password input field */}
+                {/* Password input field */}
                 <Input
                   type={showPassword ? "text" : "password"}
                   onChange={(e) =>
@@ -125,7 +125,7 @@ export default function SignupCard() {
                   value={inputs.password}
                 />
                 <InputRightElement h={"full"}>
-                  {/* Render show/hide password button */}
+                  {/* Show/hide password button */}
                   <Button
                     variant={"ghost"}
                     onClick={() =>
@@ -138,7 +138,7 @@ export default function SignupCard() {
               </InputGroup>
             </FormControl>
             <Stack spacing={10} pt={2}>
-              {/* Render signup button */}
+              {/* Signup button */}
               <Button
                 loadingText="Submitting"
                 size="lg"
@@ -153,7 +153,7 @@ export default function SignupCard() {
               </Button>
             </Stack>
             <Stack pt={6}>
-              {/* Render login link */}
+              {/* Login link */}
               <Text align={"center"}>
                 Already a user?{" "}
                 <Link color={"blue.400"} onClick={() => setAuthScreen("login")}>

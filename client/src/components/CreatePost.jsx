@@ -155,7 +155,7 @@ const CreatePost = () => {
 
   return (
     <>
-      {/* Render the create post button */}
+      {/* Create post button */}
       <Button
         position={"fixed"}
         bottom={10}
@@ -167,7 +167,7 @@ const CreatePost = () => {
         <AddIcon />
       </Button>
 
-      {/* Render the create post modal */}
+      {/* Create post modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
 
@@ -176,7 +176,7 @@ const CreatePost = () => {
           <ModalCloseButton />
           <ModalBody pb={6}>
             <FormControl>
-              {/* Render the post text input */}
+              {/* Post text input */}
               <Textarea
                 placeholder="Post content goes here..."
                 onChange={handleTextChange}
@@ -197,7 +197,7 @@ const CreatePost = () => {
                   ))}
                 </Box>
               )}
-              {/* Render the remaining character count */}
+              {/* Remaining character count */}
               <Text
                 fontSize="xs"
                 fontWeight="bold"
@@ -207,14 +207,14 @@ const CreatePost = () => {
               >
                 {remainingChar}/{MAX_CHAR}
               </Text>
-              {/* Render the hidden file input for image upload */}
+              {/* Hidden file input for image upload */}
               <Input
                 type="file"
                 hidden
                 ref={imageRef}
                 onChange={handleImageChange}
               />
-              {/* Render the image upload icon */}
+              {/* Image upload icon */}
               <BsFillImageFill
                 style={{ marginLeft: "5px", cursor: "pointer" }}
                 size={16}
@@ -222,7 +222,7 @@ const CreatePost = () => {
               />
             </FormControl>
 
-            {/* Render the selected image preview */}
+            {/* Selected image preview */}
             {imgUrl && (
               <Flex mt={5} w={"full"} position={"relative"}>
                 <Image src={imgUrl} alt="Selected img" />
@@ -239,7 +239,7 @@ const CreatePost = () => {
             )}
           </ModalBody>
 
-          {/* Render the post button */}
+          {/* Post button */}
           <ModalFooter>
             <Button
               colorScheme="blue"

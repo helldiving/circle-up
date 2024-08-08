@@ -107,7 +107,7 @@ export default function LoginCard() {
                   }
                 />
                 <InputRightElement h={"full"}>
-                  {/* Render the show/hide password button */}
+                  {/* Show/hide password button */}
                   <Button
                     variant={"ghost"}
                     onClick={() =>
@@ -120,7 +120,7 @@ export default function LoginCard() {
               </InputGroup>
             </FormControl>
             <Stack spacing={10} pt={2}>
-              {/* Render the login button */}
+              {/* Login button */}
               <Button
                 loadingText="Submitting"
                 size="lg"
@@ -136,7 +136,7 @@ export default function LoginCard() {
               </Button>
             </Stack>
             <Stack pt={6}>
-              {/* Render the signup link */}
+              {/* Signup link */}
               <Text align={"center"}>
                 Don't have an account?{" "}
                 <Link

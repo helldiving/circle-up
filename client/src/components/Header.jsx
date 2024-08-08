@@ -16,13 +16,13 @@ const Header = () => {
 
   return (
     <Flex justifyContent={"space-between"} mt={6} mb="12">
-      {/* Render the home link if user is logged in */}
+      {/* Home link if user is logged in */}
       {user && (
         <Link as={RouterLink} to="/">
           <AiFillHome size={24} />
         </Link>
       )}
-      {/* Render the login link if user is not logged in */}
+      {/* Login link if user is not logged in */}
       {!user && (
         <Link
           as={RouterLink}
@@ -33,7 +33,7 @@ const Header = () => {
         </Link>
       )}
 
-      {/* Render the logo image */}
+      {/* Logo image */}
       <Image
         cursor={"pointer"}
         alt="logo"
@@ -43,7 +43,7 @@ const Header = () => {
         onClick={toggleColorMode}
       />
 
-      {/* Render the user avatar and logout button if user is logged in */}
+      {/* User avatar and logout button if user is logged in */}
       {user && (
         <Flex alignItems={"center"} gap={2}>
           <Link as={RouterLink} to={`/${user.username}`}>
@@ -55,7 +55,7 @@ const Header = () => {
         </Flex>
       )}
 
-      {/* Render the signup link if user is not logged in */}
+      {/* Signup link if user is not logged in */}
       {!user && (
         <Link
           as={RouterLink}

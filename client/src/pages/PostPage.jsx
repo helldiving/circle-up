@@ -122,7 +122,7 @@ const PostPage = () => {
             {formatDistanceToNow(new Date(currentPost.createdAt))} ago
           </Text>
 
-          {/* Render the delete icon if the current user is the post owner */}
+          {/* Delete icon if the current user is the post owner */}
           {currentUser?._id === user._id && (
             <DeleteIcon
               size={20}
@@ -133,10 +133,10 @@ const PostPage = () => {
         </Flex>
       </Flex>
 
-      {/* Render the post text */}
+      {/* Post text */}
       <Text my={3}>{currentPost.text}</Text>
 
-      {/* Render the post image */}
+      {/* RPost image */}
       {currentPost.img && (
         <Box
           borderRadius={6}
@@ -148,7 +148,7 @@ const PostPage = () => {
         </Box>
       )}
 
-      {/* Render the post actions */}
+      {/* Post actions */}
       <Flex gap={3} my={3}>
         <Actions post={currentPost} />
       </Flex>
@@ -164,7 +164,7 @@ const PostPage = () => {
         {/* <Button>Get</Button>
       </Flex> */}
 
-      {/* Render the comments */}
+      {/* Replies */}
       <Divider my={4} />
       {currentPost.replies.map((reply) => (
         <Comment

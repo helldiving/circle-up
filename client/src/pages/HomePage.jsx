@@ -56,7 +56,7 @@ const HomePage = () => {
           <h1>Follow some users to see the feed</h1>
         )}
 
-        {/* Render a loading spinner while posts are being fetched */}
+        {/* Loading spinner while posts are being fetched */}
         {loading && (
           <Flex justify="center">
             <Spinner size="xl" />

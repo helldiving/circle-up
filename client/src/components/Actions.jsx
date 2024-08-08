@@ -119,7 +119,7 @@ const Actions = ({ post }) => {
 
   return (
     <Flex flexDirection="column">
-      {/* Render like, comment, repost, and share actions */}
+      {/* Like, comment, repost, and share actions */}
 
       <Flex gap={3} my={2} onClick={(e) => e.preventDefault()}>
         <svg
@@ -163,7 +163,7 @@ const Actions = ({ post }) => {
         <ShareSVG />
       </Flex>
 
-      {/* Render reply and like counts */}
+      {/* Reply and like counts */}
       <Flex gap={2} alignItems={"center"}>
         <Text color={"gray.light"} fontSize="sm">
           {post.replies.length} replies
@@ -174,7 +174,7 @@ const Actions = ({ post }) => {
         </Text>
       </Flex>
 
-      {/* Render reply modal */}
+      {/* Reply modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -209,7 +209,7 @@ const Actions = ({ post }) => {
 
 export default Actions;
 
-// Component for rendering the repost SVG icon
+// Repost SVG icon
 const RepostSVG = () => {
   return (
     <svg
@@ -230,7 +230,7 @@ const RepostSVG = () => {
   );
 };
 
-// Component for rendering the share SVG icon
+// Share SVG icon
 const ShareSVG = () => {
   return (
     <svg

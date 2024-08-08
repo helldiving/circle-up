@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import Post from "../../models/postModel.js"; // adjust the path as needed
+import Post from "../../models/postModel.js";
 
 dotenv.config();
 
