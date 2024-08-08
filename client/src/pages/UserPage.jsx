@@ -2,49 +2,31 @@ import { useEffect, useState } from "react";
 import UserHeader from "../components/UserHeader";
 import { useParams } from "react-router-dom";
 import useShowToast from "../hooks/useShowToast";
-import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Text, VStack } from "@chakra-ui/react";
 import { useRecoilState } from "recoil";
 import Post from "../components/Post";
 import useGetUserProfile from "../hooks/useGetUserProfile";
 import postsAtom from "../atoms/postsAtom";
+import UserReply from "../components/UserReply";
 
 const UserPage = () => {
-  // Get the user profile using the custom hook
   const { user, loading } = useGetUserProfile();
-
-  // Get the username from the URL parameters
   const { username } = useParams();
-
-  // Custom hook to show toast notifications
   const showToast = useShowToast();
-
-  // Get the posts state from the postsAtom and the setter function
   const [posts, setPosts] = useRecoilState(postsAtom);
-
-  // State to track if the posts are being fetched
   const [fetchingPosts, setFetchingPosts] = useState(true);
+  const [replies, setReplies] = useState([]);
+  const [fetchingReplies, setFetchingReplies] = useState(false);
+  const [activeTab, setActiveTab] = useState("publications");
 
   useEffect(() => {
-    console.log("Current user:", user);
-
     const getPosts = async () => {
-      // Check if the user exists before fetching posts
       if (!user) return;
       setFetchingPosts(true);
       try {
         const res = await fetch(`/api/posts/user/${username}`);
         const data = await res.json();
-        console.log("Raw fetched posts data:", data);
         if (Array.isArray(data)) {
-          console.log("Posts are an array with length:", data.length);
-          data.forEach((post, index) => {
-            console.log(`Post ${index}:`, {
-              id: post._id,
-              postedBy: post.postedBy.username,
-              taggedUsers: post.taggedUsers.map((u) => u.username),
-              text: post.text.substring(0, 50) + "...",
-            });
-          });
           setPosts(data);
         } else {
           console.error("Received non-array data:", data);
@@ -57,35 +39,41 @@ const UserPage = () => {
         setFetchingPosts(false);
       }
     };
-    if (user) {
+    if (user && activeTab === "publications") {
       getPosts();
     }
-  }, [username, showToast, setPosts, user]);
+  }, [username, showToast, setPosts, user, activeTab]);
 
-  //     try {
-  //       const res = await fetch(`/api/posts/user/${username}`);
-  //       const data = await res.json();
-  //       console.log("Fetched posts:", data);
-  //       console.log(data);
-  //       if (Array.isArray(data)) {
-  //         setPosts(data);
-  //       } else {
-  //         console.error("Received non-array data:", data);
-  //         setPosts([]);
-  //       }
-  //     } catch (error) {
-  //       showToast("Error", error.message, "error");
-  //       setPosts([]);
-  //     } finally {
-  //       setFetchingPosts(false);
-  //     }
-  //   };
+  useEffect(() => {
+    const getReplies = async () => {
+      if (!user) return;
+      setFetchingReplies(true);
+      try {
+        const res = await fetch(`/api/users/replies/${username}`);
+        const data = await res.json();
+        console.log("Replies data:", JSON.stringify(data, null, 2));
+        if (Array.isArray(data) && data.length > 0) {
+          const validReplies = data.filter(
+            (reply) => reply && reply.reply && reply.reply.createdAt
+          );
+          console.log("Valid replies:", JSON.stringify(validReplies, null, 2));
+          setReplies(validReplies);
+        } else {
+          setReplies([]);
+        }
+      } catch (error) {
+        showToast("Error", error.message, "error");
+        setReplies([]);
+      } finally {
+        setFetchingReplies(false);
+      }
+    };
 
-  //   // Fetch the user's posts when the component mounts or the user changes
-  //   getPosts();
-  // }, [username, showToast, setPosts, user]);
+    if (activeTab === "replies") {
+      getReplies();
+    }
+  }, [username, user, activeTab, showToast]);
 
-  // Render a loading spinner while the user profile is being fetched
   if (!user && loading) {
     return (
       <Flex justifyContent={"center"}>
@@ -94,45 +82,72 @@ const UserPage = () => {
     );
   }
 
-  // Render a message if the user is not found
   if (!user && !loading) return <h1>User not found</h1>;
 
   return (
     <>
-      {/* Render the user header */}
       <UserHeader user={user} />
-      {/* Render a message if the user has no posts */}
-      {!fetchingPosts && posts.length === 0 && <Text>User has no posts.</Text>}
 
-      {/* Render a loading spinner while fetching posts */}
-      {fetchingPosts && (
-        <Flex justifyContent={"center"} my={12}>
-          <Spinner size={"xl"} />
+      <Flex w={"full"} mb={4}>
+        <Flex
+          flex={1}
+          borderBottom={
+            activeTab === "publications" ? "2px solid" : "1px solid"
+          }
+          borderColor={activeTab === "publications" ? "blue.500" : "gray.light"}
+          justifyContent={"center"}
+          pb="3"
+          cursor={"pointer"}
+          onClick={() => setActiveTab("publications")}
+        >
+          <Text fontWeight={"bold"}>Publications</Text>
         </Flex>
+        <Flex
+          flex={1}
+          borderBottom={activeTab === "replies" ? "2px solid" : "1px solid"}
+          borderColor={activeTab === "replies" ? "blue.500" : "gray.light"}
+          justifyContent={"center"}
+          pb="3"
+          cursor={"pointer"}
+          onClick={() => setActiveTab("replies")}
+        >
+          <Text fontWeight={"bold"}>Replies</Text>
+        </Flex>
+      </Flex>
+
+      {activeTab === "publications" && (
+        <>
+          {!fetchingPosts && posts.length === 0 && (
+            <Text>User has no publications.</Text>
+          )}
+          {fetchingPosts && (
+            <Flex justifyContent={"center"} my={12}>
+              <Spinner size={"xl"} />
+            </Flex>
+          )}
+          {posts.map((post) => (
+            <Post key={post._id} post={post} postedBy={post.postedBy} />
+          ))}
+        </>
       )}
 
-      {/* Render the user's posts by passing props to Post component */}
-      {posts.map((post) => {
-        console.log("Full post object:", post);
-        if (!post || !post.postedBy) {
-          console.log("Skipping post due to missing postedBy:", post);
-          return null;
-        }
-        return (
-          <Box key={post._id}>
-            {post.postedBy._id === user._id ? (
-              <Text fontSize="sm" color="gray.500">
-                {/* Your post */}
-              </Text>
-            ) : (
-              <Text fontSize="sm" color="blue.500">
-                {/* You were tagged in this post by @{post.postedBy.username}  */}
-              </Text>
-            )}
-            <Post post={post} postedBy={post.postedBy} />
-          </Box>
-        );
-      })}
+      {activeTab === "replies" && (
+        <>
+          {!fetchingReplies && replies.length === 0 && (
+            <Text>User has no replies.</Text>
+          )}
+          {fetchingReplies && (
+            <Flex justifyContent={"center"} my={12}>
+              <Spinner size={"xl"} />
+            </Flex>
+          )}
+          <VStack spacing={4} align="stretch">
+            {replies.map((reply, index) => (
+              <UserReply key={`${reply._id}-${index}`} reply={reply} />
+            ))}
+          </VStack>
+        </>
+      )}
     </>
   );
 };

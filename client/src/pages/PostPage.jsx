@@ -76,7 +76,6 @@ const PostPage = () => {
         return;
       }
 
-      // Show a success toast and navigate to the user's profile page
       showToast("Success", "Post deleted", "success");
       navigate(`/${user.username}`);
     } catch (error) {
@@ -84,7 +83,7 @@ const PostPage = () => {
     }
   };
 
-  // Render a loading spinner while the user profile is being fetched
+  // Loading spinner while the user profile is being fetched
   if (!user && loading) {
     return (
       <Flex justifyContent={"center"}>
@@ -101,19 +100,19 @@ const PostPage = () => {
     <>
       <Flex>
         <Flex w={"full"} alignItems={"center"} gap={3}>
-          {/* Render the user avatar */}
+          {/* User avatar */}
           <Avatar src={user.profilePic} size={"md"} name="Mark Zuckerberg" />
           <Flex>
-            {/* Render the username */}
+            {/* Username */}
             <Text fontSize={"sm"} fontWeight={"bold"}>
               {user.username}
             </Text>
-            {/* Render the verified badge */}
+            {/*  Verified badge */}
             <Image src="/verified.png" w="4" h={4} ml={4} />
           </Flex>
         </Flex>
         <Flex gap={4} alignItems={"center"}>
-          {/* Render the post creation time */}
+          {/* Post creation time */}
           <Text
             fontSize={"xs"}
             width={36}

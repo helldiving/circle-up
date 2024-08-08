@@ -28,10 +28,8 @@ export default function UpdateProfilePage() {
     password: "",
   });
 
-  // Ref to store the file input reference
   const fileRef = useRef(null);
 
-  // State to track if the update request is in progress
   const [updating, setUpdating] = useState(false);
 
   const showToast = useShowToast();
@@ -40,7 +38,6 @@ export default function UpdateProfilePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if an update is already in progress
     if (updating) return;
     setUpdating(true);
 
@@ -53,15 +50,13 @@ export default function UpdateProfilePage() {
         },
         body: JSON.stringify({ ...inputs, profilePic: imgUrl }),
       });
-      const data = await res.json(); // updated user object/data
+      const data = await res.json();
 
-      // Check for errors in the response
       if (data.error) {
         showToast("Error", data.error, "error");
         return;
       }
 
-      // Show a success toast and update the user state and local storage
       showToast("Success", "Profile updated successfully", "success");
       setUser(data);
       localStorage.setItem("user-info", JSON.stringify(data));
@@ -91,7 +86,7 @@ export default function UpdateProfilePage() {
           <FormControl id="userName">
             <Stack direction={["column", "row"]} spacing={6}>
               <Center>
-                {/* Render the user avatar */}
+                {/* User avatar */}
                 <Avatar
                   size="xl"
                   boxShadow={"md"}
@@ -99,11 +94,11 @@ export default function UpdateProfilePage() {
                 />
               </Center>
               <Center w="full">
-                {/* Render the change avatar button */}
+                {/* Change avatar button */}
                 <Button w="full" onClick={() => fileRef.current.click()}>
                   Change Avatar
                 </Button>
-                {/* Render the hidden file input */}
+                {/* Hidden file input */}
                 <Input
                   type="file"
                   hidden
@@ -115,7 +110,7 @@ export default function UpdateProfilePage() {
           </FormControl>
           <FormControl>
             <FormLabel>Name</FormLabel>
-            {/* Render the name input field */}
+            {/* Name input field */}
             <Input
               placeholder="Little Amigo"
               value={inputs.name}
@@ -126,7 +121,7 @@ export default function UpdateProfilePage() {
           </FormControl>
           <FormControl>
             <FormLabel>Username</FormLabel>
-            {/* Render the username input field */}
+            {/* Username input field */}
             <Input
               placeholder="lb123"
               value={inputs.username}
@@ -139,7 +134,7 @@ export default function UpdateProfilePage() {
           </FormControl>
           <FormControl>
             <FormLabel>Email address</FormLabel>
-            {/* Render the email input field */}
+            {/* Email input field */}
             <Input
               placeholder="your-email@example.com"
               value={inputs.email}
@@ -150,7 +145,7 @@ export default function UpdateProfilePage() {
           </FormControl>
           <FormControl>
             <FormLabel>Bio</FormLabel>
-            {/* Render the bio input field */}
+            {/* Bio input field */}
             <Input
               placeholder="What's to know?"
               value={inputs.bio}
@@ -161,7 +156,7 @@ export default function UpdateProfilePage() {
           </FormControl>
           <FormControl>
             <FormLabel>Password</FormLabel>
-            {/* Render the password input field */}
+            {/* Password input field */}
             <Input
               placeholder="password"
               value={inputs.password}
@@ -173,7 +168,7 @@ export default function UpdateProfilePage() {
             />
           </FormControl>
           <Stack spacing={6} direction={["column", "row"]}>
-            {/* Render the cancel button */}
+            {/* Cancel button */}
             <Button
               bg={"red.400"}
               color={"white"}
@@ -184,7 +179,7 @@ export default function UpdateProfilePage() {
             >
               Cancel
             </Button>
-            {/* Render the submit button */}
+            {/* Submit button */}
             <Button
               bg={"green.400"}
               color={"white"}

@@ -168,7 +168,7 @@ const updateUser = async (req, res) => {
     // Check if the user is authorized to update the profile
     if (req.params.id !== userId.toString())
       // Have to convert to String since object
-      // If migo select screen take out
+      // If you implement "Migo Select" screen take out
       return res
         .status(400)
         .json({ error: "You cannot update other user's profile" });
@@ -235,6 +235,58 @@ const getUsers = async (req, res) => {
   }
 };
 
+const getUserReplies = async (req, res) => {
+  const { username } = req.params;
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const replies = await Post.aggregate([
+      { $unwind: "$replies" },
+      { $match: { "replies.userId": user._id } },
+      { $sort: { "replies.createdAt": -1 } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "postedBy",
+          foreignField: "_id",
+          as: "postedBy",
+        },
+      },
+      { $unwind: "$postedBy" },
+      {
+        $project: {
+          _id: 1,
+          postText: "$text",
+          postedBy: {
+            _id: "$postedBy._id",
+            username: "$postedBy.username",
+            profilePic: "$postedBy.profilePic",
+          },
+          reply: {
+            _id: "$replies._id",
+            text: "$replies.text",
+            createdAt: { $ifNull: ["$replies.createdAt", new Date()] },
+            userId: "$replies.userId",
+            username: "$replies.username",
+            userProfilePic: "$replies.userProfilePic",
+          },
+          createdAt: { $ifNull: ["$replies.createdAt", new Date()] },
+        },
+      },
+    ]);
+
+    console.log("Replies from backend:", JSON.stringify(replies, null, 2));
+
+    res.status(200).json(replies);
+  } catch (error) {
+    console.error("Error in getUserReplies:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export {
   signupUser,
   loginUser,
@@ -243,4 +295,5 @@ export {
   updateUser,
   getUserProfile,
   getUsers,
+  getUserReplies,
 };

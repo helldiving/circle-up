@@ -1,5 +1,27 @@
 import mongoose from "mongoose";
 
+const replySchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  text: {
+    type: String,
+    required: true,
+  },
+  userProfilePic: {
+    type: String,
+  },
+  username: {
+    type: String,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const postSchema = mongoose.Schema(
   {
     postedBy: {
@@ -15,30 +37,11 @@ const postSchema = mongoose.Schema(
       type: String,
     },
     likes: {
-      // Array of user IDs who liked the post
       type: [mongoose.Schema.Types.ObjectId],
       ref: "User",
       default: [],
     },
-    replies: [
-      {
-        userId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-          required: true,
-        },
-        text: {
-          type: String,
-          required: true,
-        },
-        userProfilePic: {
-          type: String,
-        },
-        username: {
-          type: String,
-        },
-      },
-    ],
+    replies: [replySchema], // separate reply schema
     taggedUsers: [
       {
         type: mongoose.Schema.Types.ObjectId,
