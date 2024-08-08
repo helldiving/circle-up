@@ -15,6 +15,7 @@ import { useRecoilState } from "recoil";
 import userAtom from "../atoms/userAtom";
 import usePreviewImg from "../hooks/usePreviewImg";
 import useShowToast from "../hooks/useShowToast";
+import { useNavigate } from "react-router-dom";
 
 export default function UpdateProfilePage() {
   const [user, setUser] = useRecoilState(userAtom);
@@ -26,12 +27,14 @@ export default function UpdateProfilePage() {
     email: user.email,
     bio: user.bio,
     password: "",
+    badgeText: user.badgeText || "",
+    website: user.website || "",
+    instagram: user.instagram || "",
   });
 
+  const navigate = useNavigate();
   const fileRef = useRef(null);
-
   const [updating, setUpdating] = useState(false);
-
   const showToast = useShowToast();
 
   const { handleImageChange, imgUrl } = usePreviewImg();
@@ -60,11 +63,17 @@ export default function UpdateProfilePage() {
       showToast("Success", "Profile updated successfully", "success");
       setUser(data);
       localStorage.setItem("user-info", JSON.stringify(data));
+      navigate(`/${data.username}`);
     } catch (error) {
       showToast("Error", error, "error");
     } finally {
       setUpdating(false);
     }
+  };
+
+  // Cancel button redirects to user profile page
+  const handleCancel = () => {
+    navigate(`/${user.username}`);
   };
 
   return (
@@ -144,6 +153,18 @@ export default function UpdateProfilePage() {
             />
           </FormControl>
           <FormControl>
+            <FormLabel>Badge Text</FormLabel>
+            <Input
+              placeholder="Your custom badge text"
+              value={inputs.badgeText}
+              onChange={(e) =>
+                setInputs({ ...inputs, badgeText: e.target.value })
+              }
+              _placeholder={{ color: "gray.500" }}
+              type="text"
+            />
+          </FormControl>
+          <FormControl>
             <FormLabel>Bio</FormLabel>
             {/* Bio input field */}
             <Input
@@ -152,6 +173,28 @@ export default function UpdateProfilePage() {
               onChange={(e) => setInputs({ ...inputs, bio: e.target.value })}
               _placeholder={{ color: "gray.500" }}
               type="text"
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Website</FormLabel>
+            <Input
+              placeholder="Include https:// in your link"
+              value={inputs.website}
+              onChange={(e) =>
+                setInputs({ ...inputs, website: e.target.value })
+              }
+              type="url"
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Instagram</FormLabel>
+            <Input
+              placeholder="Your Instagram profile URL"
+              value={inputs.instagram}
+              onChange={(e) =>
+                setInputs({ ...inputs, instagram: e.target.value })
+              }
+              type="url"
             />
           </FormControl>
           <FormControl>
@@ -176,6 +219,7 @@ export default function UpdateProfilePage() {
               _hover={{
                 bg: "red.500",
               }}
+              onClick={handleCancel}
             >
               Cancel
             </Button>

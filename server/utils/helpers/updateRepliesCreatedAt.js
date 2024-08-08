@@ -1,3 +1,5 @@
+// script to add replies to mongo
+
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import Post from "../../models/postModel.js";

@@ -39,6 +39,18 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "",
     },
+    badgeText: {
+      type: String,
+      default: "",
+    },
+    website: {
+      type: String,
+      default: "",
+    },
+    instagram: {
+      type: String,
+      default: "",
+    },
     isFrozen: {
       type: Boolean,
       default: false,

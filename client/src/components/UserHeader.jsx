@@ -29,6 +29,12 @@ const UserHeader = ({ user }) => {
     });
   };
 
+  // hides https:// from displaying with website on user profile page
+  const formatWebsiteUrl = (url) => {
+    if (!url) return "";
+    return url.replace(/(^\w+:|^)\/\//, "");
+  };
+
   return (
     <VStack gap={4} alignItems={"start"}>
       <Flex justifyContent={"space-between"} w={"full"}>
@@ -38,21 +44,23 @@ const UserHeader = ({ user }) => {
             {user.name}
           </Text>
           <Flex gap={2} alignItems={"center"}>
-            <Text fontSize={"sm"}>{user.username}</Text>
-            {/* circleup.live badge */}
-            <Text
-              fontSize={"xs"}
-              bg={"gray.dark"}
-              color={"gray.light"}
-              px={1}
-              alignItems="25%"
-              borderRadius={"full"}
-              display="flex"
-              justifyContent="center"
-              height="20px"
-            >
-              circleup.live
-            </Text>
+            <Text fontSize={"sm"}>@{user.username}</Text>
+            {/* User badge */}
+            {user.badgeText && (
+              <Text
+                fontSize={"xs"}
+                bg={"gray.dark"}
+                color={"gray.light"}
+                px={1}
+                alignItems="25%"
+                borderRadius={"full"}
+                display="flex"
+                justifyContent="center"
+                height="20px"
+              >
+                {user.badgeText}
+              </Text>
+            )}
           </Flex>
         </Box>
         <Box>
@@ -100,14 +108,24 @@ const UserHeader = ({ user }) => {
           {/* Follower count */}
           <Text color={"gray.light"}>{user.followers.length} followers</Text>
           <Box w="1" h="1" bg={"gray.light"} borderRadius={"full"}></Box>
-          {/* Instagram link */}
-          <Link color={"gray.light"}>instagram.com</Link>
+          {/* Website link */}
+          {user.website ? (
+            <Link href={user.website} isExternal color={"gray.light"}>
+              {formatWebsiteUrl(user.website)}
+            </Link>
+          ) : (
+            <Text color={"gray.light"}>circleup.live</Text>
+          )}
         </Flex>
         <Flex>
-          <Box className="icon-container">
-            {/* Instagram icon */}
-            <BsInstagram size={24} cursor={"pointer"} />
-          </Box>
+          {/* Instagram Icon / Link*/}
+          {user.instagram && (
+            <Box className="icon-container">
+              <Link href={user.instagram} isExternal>
+                <BsInstagram size={24} cursor={"pointer"} />
+              </Link>
+            </Box>
+          )}
           <Box className="icon-container">
             {/* More options menu */}
             <Menu>
