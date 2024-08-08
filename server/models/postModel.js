@@ -48,6 +48,16 @@ const postSchema = mongoose.Schema(
         ref: "User",
       },
     ],
+    isAnonymous: {
+      type: Boolean,
+      default: false,
+    },
+    shuffledUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     timestamps: true,

@@ -10,6 +10,7 @@ import userAtom from "../atoms/userAtom";
 import { DeleteIcon } from "@chakra-ui/icons";
 import { useRecoilState, useRecoilValue } from "recoil";
 import postsAtom from "../atoms/postsAtom";
+import AnonPostHeader from "./AnonPostHeader";
 
 const Post = ({ post, postedBy }) => {
   const currentUser = useRecoilValue(userAtom);
@@ -18,12 +19,12 @@ const Post = ({ post, postedBy }) => {
   const [posts, setPosts] = useRecoilState(postsAtom);
   const navigate = useNavigate();
 
-  // null check
-  if (!post || !postedBy || !currentUser) {
-    return null; // or return a loading indicator?
-  }
-
   useEffect(() => {
+    console.log("Post data:", post);
+    console.log("PostedBy:", postedBy);
+    console.log("Is Anonymous:", post?.isAnonymous);
+    console.log("Shuffled Users:", post?.shuffledUsers);
+
     const getUser = async () => {
       if (!postedBy) {
         console.error("postedBy is undefined");
@@ -48,11 +49,12 @@ const Post = ({ post, postedBy }) => {
     };
 
     getUser();
-  }, [postedBy]);
+  }, [post, postedBy]);
 
-  if (!post || !postedBy) {
-    console.log("Post or postedBy is null:", { post, postedBy });
-    return null;
+  // null check
+  if (!post || !postedBy || !currentUser) {
+    console.log("Null check failed:", { post, postedBy, currentUser });
+    return null; // or return a loading indicator?
   }
 
   if (!user) {
@@ -124,15 +126,11 @@ const Post = ({ post, postedBy }) => {
       <Flex gap={3} mb={4} py={5}>
         {/* User avatar and reply avatars */}
         <Flex flexDirection={"column"} alignItems={"center"}>
-          <Avatar
-            size="md"
-            name={user.name}
-            src={user?.profilePic}
-            onClick={(e) => {
-              e.preventDefault();
-              navigate(`/${user.username}`);
-            }}
-          />
+          {post.isAnonymous ? (
+            <AnonPostHeader shuffledUsers={post.shuffledUsers} />
+          ) : (
+            <RegularPostHeader user={user} navigate={navigate} />
+          )}
           <Box w="1px" h={"full"} bg="gray.light" my={2}></Box>
           <Box position={"relative"} w={"full"}>
             {post.replies.length === 0 && <Text textAlign={"center"}>🗨️</Text>}
@@ -158,7 +156,6 @@ const Post = ({ post, postedBy }) => {
                 padding={"2px"}
               />
             )}
-
             {post.replies[2] && (
               <Avatar
                 size="xs"
@@ -175,22 +172,28 @@ const Post = ({ post, postedBy }) => {
         <Flex flex={1} flexDirection={"column"} gap={2}>
           <Flex justifyContent={"space-between"} w={"full"}>
             <Flex w={"full"} alignItems={"center"}>
-              {/* Username */}
-              <Text
-                fontSize={"sm"}
-                fontWeight={"bold"}
+              {/* Username or "Anonymous" */}
+              <Flex
+                alignItems="center"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate(`/${user.username}`);
+                  if (!post.isAnonymous) {
+                    navigate(`/${user.username}`);
+                  }
                 }}
               >
-                {user?.username}
-              </Text>
-              {/* Verified badge */}
-              <Image src="/verified.png" w={4} h={4} ml={1} />
+                <Text fontSize={"sm"} fontWeight={"bold"} mr={1}>
+                  {post.isAnonymous ? "Might be..." : user?.username}
+                </Text>
+                {post.isAnonymous ? (
+                  <Image src="/anonymous.png" w={4} h={4} />
+                ) : (
+                  <Image src="/verified.png" w={4} h={4} />
+                )}
+              </Flex>
             </Flex>
             <Flex gap={4} alignItems={"center"}>
-              {/* Render post creation time */}
+              {/* Post creation time */}
               <Text
                 fontSize={"xs"}
                 width={36}
@@ -241,5 +244,17 @@ const Post = ({ post, postedBy }) => {
     </Link>
   );
 };
+
+const RegularPostHeader = ({ user, navigate }) => (
+  <Avatar
+    size="md"
+    name={user.name}
+    src={user?.profilePic}
+    onClick={(e) => {
+      e.preventDefault();
+      navigate(`/${user.username}`);
+    }}
+  />
+);
 
 export default Post;

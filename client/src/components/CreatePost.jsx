@@ -29,6 +29,8 @@ import useShowToast from "../hooks/useShowToast";
 import { useParams } from "react-router-dom";
 import postsAtom from "../atoms/postsAtom";
 import TagInput from "./TagInput";
+import { PiSmileyWinkBold } from "react-icons/pi";
+import UserSelection from "./UserSelection";
 
 const MAX_CHAR = 500;
 
@@ -38,7 +40,7 @@ const CreatePost = () => {
   const { handleImageChange, imgUrl, setImgUrl } = usePreviewImg();
   const imageRef = useRef(null);
   const [remainingChar, setRemainingChar] = useState(500);
-  const user = useRecoilValue(userAtom);
+  const currentUser = useRecoilValue(userAtom);
   const showToast = useShowToast();
   const [loading, setLoading] = useState(false);
   const [posts, setPosts] = useRecoilState(postsAtom);
@@ -47,6 +49,8 @@ const CreatePost = () => {
   const [existingUsers, setExistingUsers] = useState([]);
   const [showUserList, setShowUserList] = useState(false);
   const [matchingUsers, setMatchingUsers] = useState([]);
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -58,15 +62,17 @@ const CreatePost = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("Fetched data:", data);
-        setExistingUsers(Array.isArray(data) ? data : []);
+        const filteredUsers = data.filter(
+          (user) => user._id !== currentUser._id
+        );
+        setExistingUsers(filteredUsers);
       } catch (error) {
         console.error("Error fetching users:", error);
         setExistingUsers([]);
       }
     };
     fetchUsers();
-  }, []);
+  }, [currentUser._id]);
 
   // Handle text change in the post input
   const handleTextChange = (e) => {
@@ -108,36 +114,35 @@ const CreatePost = () => {
   const handleCreatePost = async () => {
     setLoading(true);
     try {
-      const taggedUserIds = taggedUsers
-        .map((username) => {
-          const user = existingUsers.find((u) => u.username === username);
-          return user ? user._id : null;
-        })
-        .filter((id) => id !== null);
+      const postData = {
+        postedBy: currentUser._id,
+        text: postText,
+        img: imgUrl,
+        taggedUsers: taggedUsers.map((u) => u._id),
+        isAnonymous: isAnonymous,
+        selectedUsers: isAnonymous ? selectedUsers.map((u) => u._id) : [],
+      };
 
-      console.log("Tagged user IDs:", taggedUserIds);
+      console.log("Sending post data:", postData);
 
       const res = await fetch("/api/posts/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          postedBy: user._id,
-          text: postText,
-          img: imgUrl,
-          taggedUsers: taggedUserIds,
-        }),
+        body: JSON.stringify(postData),
       });
 
       const data = await res.json();
+      console.log("Received post data:", data);
+
       if (data.error) {
         showToast("Error", data.error, "error");
         return;
       }
       showToast("Success", "Post created successfully", "success");
       // If on user's own profile page, add new post to the top of the list
-      if (username === user.username) {
+      if (username === currentUser.username) {
         setPosts([data, ...posts]);
       }
       // Add new post to the global posts state
@@ -145,11 +150,28 @@ const CreatePost = () => {
       onClose();
       setPostText(""); // reset text
       setImgUrl(""); // reset image
+      setIsAnonymous(false); // reset anonymous state
+      setSelectedUsers([]); // reset selected users
     } catch (error) {
-      showToast("Error", error, "error");
+      showToast("Error", error.message, "error");
     } finally {
       // Reset updating state regardless of outcome
       setLoading(false);
+    }
+  };
+
+  // Anonymous Post toggle
+  const handleAnonymousToggle = () => {
+    setIsAnonymous(!isAnonymous);
+  };
+  // Anonymous User Select
+  const handleUserSelection = (user) => {
+    if (selectedUsers.length < 2 || selectedUsers.includes(user)) {
+      setSelectedUsers((prevUsers) =>
+        prevUsers.includes(user)
+          ? prevUsers.filter((u) => u !== user)
+          : [...prevUsers, user]
+      );
     }
   };
 
@@ -220,6 +242,11 @@ const CreatePost = () => {
                 size={16}
                 onClick={() => imageRef.current.click()} // will open Input right above
               />
+              {/* Anonymous posting toggle */}
+              <Button onClick={handleAnonymousToggle} mt={2}>
+                <PiSmileyWinkBold />
+                {isAnonymous ? "Post Anonymously" : "Post Normally"}
+              </Button>
             </FormControl>
 
             {/* Selected image preview */}
@@ -237,8 +264,15 @@ const CreatePost = () => {
                 />
               </Flex>
             )}
+            {/* User selection for anonymous posting */}
+            {isAnonymous && (
+              <UserSelection
+                selectedUsers={selectedUsers}
+                onUserSelect={handleUserSelection}
+                existingUsers={existingUsers}
+              />
+            )}
           </ModalBody>
-
           {/* Post button */}
           <ModalFooter>
             <Button

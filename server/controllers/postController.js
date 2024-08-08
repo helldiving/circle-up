@@ -4,8 +4,16 @@ import { v2 as cloudinary } from "cloudinary";
 
 const createPost = async (req, res) => {
   try {
-    const { postedBy, text } = req.body;
+    const { postedBy, text, isAnonymous, selectedUsers } = req.body;
     let { img, taggedUsers } = req.body;
+
+    console.log("Received post data:", {
+      postedBy,
+      text,
+      isAnonymous,
+      selectedUsers,
+      taggedUsers,
+    });
 
     // Check if postedBy and text fields are provided
     if (!postedBy || !text) {
@@ -46,27 +54,44 @@ const createPost = async (req, res) => {
     });
 
     taggedUsers = mentionedUsers.map((user) => user._id);
-
     console.log("Tagged user IDs:", taggedUsers);
 
+    // Shuffled Users
+    let shuffledUsers = [];
+    if (
+      isAnonymous &&
+      Array.isArray(selectedUsers) &&
+      selectedUsers.length > 0
+    ) {
+      const selectedUserObjects = await User.find({
+        _id: { $in: selectedUsers },
+      });
+      const poster = await User.findById(postedBy);
+      const allUsers = [...selectedUserObjects, poster];
+      shuffledUsers = allUsers.sort(() => 0.5 - Math.random());
+    }
+
     // Create a new post
-    const newPost = new Post({ postedBy, text, img, taggedUsers });
+    const newPost = new Post({
+      postedBy,
+      text,
+      img,
+      taggedUsers,
+      isAnonymous,
+      shuffledUsers: shuffledUsers.map((u) => u._id),
+    });
 
     await newPost.save();
-
     await newPost.populate("postedBy", "_id username profilePic");
     await newPost.populate("taggedUsers", "_id username");
+    await newPost.populate("shuffledUsers", "_id username profilePic");
 
-    console.log("Creating new post:", {
-      postedBy: newPost.postedBy,
-      text: newPost.text,
-      taggedUsers: newPost.taggedUsers,
-    });
+    console.log("Created post:", newPost);
 
     res.status(201).json(newPost);
   } catch (err) {
+    console.error("Error creating post:", err);
     res.status(500).json({ error: err.message });
-    console.log(err);
   }
 };
 
@@ -180,7 +205,8 @@ const getFeedPosts = async (req, res) => {
     // Find all posts and populate the postedBy field with user details
     const feedPosts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate("postedBy", "name username profilePic");
+      .populate("postedBy", "name username profilePic")
+      .populate("shuffledUsers", "username profilePic");
 
     res.status(200).json(feedPosts);
   } catch (err) {
@@ -222,10 +248,14 @@ const getUserPosts = async (req, res) => {
     console.log("Fetching posts for user:", user._id);
 
     const posts = await Post.find({
-      $or: [{ postedBy: user._id }, { taggedUsers: user._id }],
+      $or: [
+        { postedBy: user._id, isAnonymous: false }, // only non-anonymous posts by the user
+        { taggedUsers: user._id }, // tagged posts
+      ],
     })
       .populate("postedBy", "_id username profilePic")
       .populate("taggedUsers", "_id username")
+      .populate("shuffledUsers", "_id username profilePic")
       .sort({ createdAt: -1 });
 
     console.log("Posts found:", posts.length);
@@ -236,6 +266,8 @@ const getUserPosts = async (req, res) => {
         postedBy: p.postedBy.username,
         taggedUsers: p.taggedUsers.map((u) => u.username),
         text: p.text.substring(0, 50) + "...",
+        isAnonymous: p.isAnonymous,
+        shuffledUsers: p.shuffledUsers.map((u) => u.username),
       }))
     );
 

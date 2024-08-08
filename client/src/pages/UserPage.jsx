@@ -27,7 +27,9 @@ const UserPage = () => {
         const res = await fetch(`/api/posts/user/${username}`);
         const data = await res.json();
         if (Array.isArray(data)) {
-          setPosts(data);
+          // Filter out anonymous posts
+          const filteredPosts = data.filter((post) => !post.isAnonymous);
+          setPosts(filteredPosts);
         } else {
           console.error("Received non-array data:", data);
           setPosts([]);
