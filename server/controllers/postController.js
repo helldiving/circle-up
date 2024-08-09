@@ -240,40 +240,82 @@ const getFeedPosts = async (req, res) => {
 const getUserPosts = async (req, res) => {
   const { username } = req.params;
   try {
+    console.log("Fetching posts for username:", username);
+
     const user = await User.findOne({ username });
     if (!user) {
+      console.log("User not found for username:", username);
       return res.status(404).json({ error: "User not found" });
     }
 
-    console.log("Fetching posts for user:", user._id);
+    console.log("User found:", user._id);
 
-    const posts = await Post.find({
+    const query = {
       $or: [
-        { postedBy: user._id, isAnonymous: false }, // only non-anonymous posts by the user
-        { taggedUsers: user._id }, // tagged posts
+        { postedBy: user._id },
+        { taggedUsers: user._id },
+        { shuffledUsers: user._id },
       ],
-    })
+    };
+    console.log("Query:", JSON.stringify(query));
+
+    const posts = await Post.find(query)
       .populate("postedBy", "_id username profilePic")
       .populate("taggedUsers", "_id username")
       .populate("shuffledUsers", "_id username profilePic")
       .sort({ createdAt: -1 });
 
-    console.log("Posts found:", posts.length);
-    console.log(
-      "Posts details:",
-      posts.map((p) => ({
-        id: p._id,
-        postedBy: p.postedBy.username,
-        taggedUsers: p.taggedUsers.map((u) => u.username),
-        text: p.text.substring(0, 50) + "...",
-        isAnonymous: p.isAnonymous,
-        shuffledUsers: p.shuffledUsers.map((u) => u.username),
-      }))
+    console.log("Total posts found:", posts.length);
+
+    const userPosts = posts.filter(
+      (post) =>
+        post.postedBy._id.toString() === user._id.toString() &&
+        !post.isAnonymous
+    );
+    const taggedPosts = posts.filter(
+      (post) =>
+        post.postedBy._id.toString() !== user._id.toString() &&
+        post.taggedUsers.some((u) => u._id.toString() === user._id.toString())
+    );
+    const teabagPosts = posts.filter(
+      (post) =>
+        post.isAnonymous &&
+        post.shuffledUsers.some((u) => u._id.toString() === user._id.toString())
     );
 
-    res.status(200).json(posts);
+    console.log("User's own posts:", userPosts.length);
+    console.log("Posts where user is tagged:", taggedPosts.length);
+    console.log("Teabag posts:", teabagPosts.length);
+
+    res.status(200).json({ userPosts, taggedPosts, teabagPosts });
   } catch (error) {
     console.error("Error in getUserPosts:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const getUserTeabags = async (req, res) => {
+  console.log("getUserTeabags called");
+  const { username } = req.params;
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const teabags = await Post.find({
+      isAnonymous: true,
+      shuffledUsers: user._id,
+    })
+      .populate("postedBy", "_id username profilePic")
+      .populate("shuffledUsers", "_id username profilePic")
+      .sort({ createdAt: -1 });
+
+    console.log("Teabags found:", teabags); // Add this line for debugging
+
+    res.status(200).json(teabags);
+  } catch (error) {
+    console.error("Error in getUserTeabags:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -286,4 +328,5 @@ export {
   replyToPost,
   getFeedPosts,
   getUserPosts,
+  getUserTeabags,
 };

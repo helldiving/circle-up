@@ -118,6 +118,10 @@ const CreatePost = () => {
 
   // Handle creating a new post
   const handleCreatePost = async () => {
+    if (isAnonymous && selectedUsers.length !== 2) {
+      showToast("Error", "Please select 2 users to teabag", "error");
+      return;
+    }
     setLoading(true);
     try {
       const postData = {
@@ -286,11 +290,16 @@ const CreatePost = () => {
             )}
             {/* User selection for anonymous posting */}
             {isAnonymous && (
-              <UserSelection
-                selectedUsers={selectedUsers}
-                onUserSelect={handleUserSelection}
-                existingUsers={existingUsers}
-              />
+              <>
+                <Text mt={2}>
+                  Select 2 users to teabag (selected: {selectedUsers.length}/2):
+                </Text>
+                <UserSelection
+                  selectedUsers={selectedUsers}
+                  onUserSelect={handleUserSelection}
+                  existingUsers={existingUsers}
+                />
+              </>
             )}
           </ModalBody>
           {/* Post button */}

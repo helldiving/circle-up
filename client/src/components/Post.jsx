@@ -20,16 +20,31 @@ const Post = ({ post, postedBy }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Post data:", post);
-    console.log("PostedBy:", postedBy);
+    console.log("Post component received:", { post, postedBy });
+    console.log("Post details:", {
+      id: post._id,
+      text: post.text,
+      postedBy: post.isAnonymous
+        ? "Anonymous"
+        : post.postedBy
+        ? post.postedBy.username
+        : "Unknown",
+      isAnonymous: post.isAnonymous,
+      taggedUsers: post.taggedUsers
+        ? post.taggedUsers.map((u) => u.username)
+        : [],
+      shuffledUsers: post.shuffledUsers
+        ? post.shuffledUsers.map((u) => u.username)
+        : [],
+    });
+    if (!postedBy) {
+      console.error("postedBy is undefined");
+      return;
+    }
     console.log("Is Anonymous:", post?.isAnonymous);
     console.log("Shuffled Users:", post?.shuffledUsers);
 
     const getUser = async () => {
-      if (!postedBy) {
-        console.error("postedBy is undefined");
-        return;
-      }
       try {
         if (typeof postedBy === "object" && postedBy._id) {
           setUser(postedBy);
@@ -49,7 +64,11 @@ const Post = ({ post, postedBy }) => {
     };
 
     getUser();
-  }, [post, postedBy]);
+  }, [postedBy]);
+
+  if (!user) {
+    return null; // or return a loading indicator
+  }
 
   // null check
   if (!post || !postedBy || !currentUser) {
@@ -183,7 +202,7 @@ const Post = ({ post, postedBy }) => {
                 }}
               >
                 <Text fontSize={"sm"} fontWeight={"bold"} mr={1}>
-                  {post.isAnonymous ? "Teabagged" : user?.username}
+                  {post.isAnonymous ? "" : user?.username}
                 </Text>
                 {post.isAnonymous ? (
                   <Flex alignItems="center">
