@@ -4,7 +4,7 @@ import { Flex, Avatar, Text } from "@chakra-ui/react";
 const UserSelection = ({ selectedUsers, onUserSelect, existingUsers }) => {
   return (
     <Flex direction="column" mt={4}>
-      <Text mb={2}>Select users to shuffle with (max 2):</Text>
+      <Text mb={2}>Select users to teabag (max 2):</Text>
       <Flex flexWrap="wrap">
         {existingUsers.map((user) => (
           <Avatar

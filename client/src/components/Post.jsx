@@ -183,10 +183,13 @@ const Post = ({ post, postedBy }) => {
                 }}
               >
                 <Text fontSize={"sm"} fontWeight={"bold"} mr={1}>
-                  {post.isAnonymous ? "Might be..." : user?.username}
+                  {post.isAnonymous ? "Teabagged" : user?.username}
                 </Text>
                 {post.isAnonymous ? (
-                  <Image src="/anonymous.png" w={4} h={4} />
+                  <Flex alignItems="center">
+                    <Image src="/anonymous5.png" w={4} h={4} mr={1} />
+                    <Image src="/anonymous2.png" w={4} h={4} />
+                  </Flex>
                 ) : (
                   <Image src="/verified.png" w={4} h={4} />
                 )}

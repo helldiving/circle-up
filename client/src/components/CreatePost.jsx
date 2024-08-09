@@ -29,7 +29,13 @@ import useShowToast from "../hooks/useShowToast";
 import { useParams } from "react-router-dom";
 import postsAtom from "../atoms/postsAtom";
 import TagInput from "./TagInput";
-import { PiSmileyWinkBold } from "react-icons/pi";
+import {
+  PiSmileyWinkBold,
+  PiTeaBag,
+  PiTeaBagFill,
+  PiSealQuestion,
+  PiSealQuestionFill,
+} from "react-icons/pi";
 import UserSelection from "./UserSelection";
 
 const MAX_CHAR = 500;
@@ -229,24 +235,38 @@ const CreatePost = () => {
               >
                 {remainingChar}/{MAX_CHAR}
               </Text>
-              {/* Hidden file input for image upload */}
-              <Input
-                type="file"
-                hidden
-                ref={imageRef}
-                onChange={handleImageChange}
-              />
-              {/* Image upload icon */}
-              <BsFillImageFill
-                style={{ marginLeft: "5px", cursor: "pointer" }}
-                size={16}
-                onClick={() => imageRef.current.click()} // will open Input right above
-              />
-              {/* Anonymous posting toggle */}
-              <Button onClick={handleAnonymousToggle} mt={2}>
-                <PiSmileyWinkBold />
-                {isAnonymous ? "Post Anonymously" : "Post Normally"}
-              </Button>
+
+              <Flex alignItems="center" mt={2}>
+                {/* Anonymous posting toggle */}
+                <Button
+                  onClick={handleAnonymousToggle}
+                  size="sm"
+                  variant="ghost"
+                  p={1}
+                  minW="auto"
+                >
+                  {isAnonymous ? (
+                    <PiTeaBagFill size={20} />
+                  ) : (
+                    <PiTeaBag size={20} />
+                  )}
+                </Button>
+
+                {/* Hidden file input for image upload */}
+                <Input
+                  type="file"
+                  hidden
+                  ref={imageRef}
+                  onChange={handleImageChange}
+                />
+
+                {/* Image upload icon */}
+                <BsFillImageFill
+                  style={{ cursor: "pointer", marginLeft: "8px" }}
+                  size={16}
+                  onClick={() => imageRef.current.click()}
+                />
+              </Flex>
             </FormControl>
 
             {/* Selected image preview */}
