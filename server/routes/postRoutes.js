@@ -8,6 +8,7 @@ import {
   likeUnlikePost,
   replyToPost,
   getUserTeabags,
+  getTaggedPosts,
 } from "../controllers/postController.js";
 import protectRoute from "../middlewares/protectRoute.js";
 
@@ -15,14 +16,8 @@ const router = express.Router();
 
 router.get("/feed", protectRoute, getFeedPosts);
 router.get("/user/:username", getUserPosts);
-router.get(
-  "/teabags/:username",
-  (req, res, next) => {
-    console.log("Teabags route hit:", req.params.username);
-    next();
-  },
-  getUserTeabags
-);
+router.get("/teabags/:username", getUserTeabags);
+router.get("/tagged/:username", getTaggedPosts);
 router.get("/:id", getPost);
 router.post("/create", protectRoute, createPost);
 router.delete("/:id", protectRoute, deletePost);

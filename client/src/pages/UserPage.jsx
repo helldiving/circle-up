@@ -12,8 +12,8 @@ const UserPage = () => {
   const { username } = useParams();
   const showToast = useShowToast();
   const [fetchingPosts, setFetchingPosts] = useState(true);
-  const [replies, setReplies] = useState([]);
-  const [fetchingReplies, setFetchingReplies] = useState(false);
+  const [repliesAndTags, setRepliesAndTags] = useState([]);
+  const [fetchingRepliesAndTags, setFetchingRepliesAndTags] = useState(false);
   const [activeTab, setActiveTab] = useState("publications");
   const [userPosts, setUserPosts] = useState([]);
   const [taggedPosts, setTaggedPosts] = useState([]);
@@ -24,23 +24,12 @@ const UserPage = () => {
     setFetchingPosts(true);
     try {
       const res = await fetch(`/api/posts/user/${username}`);
-      console.log("Raw response:", res);
       const data = await res.json();
-      console.log("Received data from server:", JSON.stringify(data, null, 2));
 
       if (data.userPosts && Array.isArray(data.userPosts)) {
         setUserPosts(data.userPosts);
         setTaggedPosts(data.taggedPosts || []);
         setTeabagPosts(data.teabagPosts || []);
-        console.log("User's own posts:", data.userPosts.length);
-        console.log(
-          "Tagged posts:",
-          data.taggedPosts ? data.taggedPosts.length : 0
-        );
-        console.log(
-          "Teabag posts:",
-          data.teabagPosts ? data.teabagPosts.length : 0
-        );
       } else {
         console.error("Received unexpected data structure:", data);
         setUserPosts([]);
@@ -57,34 +46,35 @@ const UserPage = () => {
     }
   };
 
-  const getReplies = async () => {
+  const getRepliesAndTags = async () => {
     if (!user) return;
-    setFetchingReplies(true);
+    setFetchingRepliesAndTags(true);
     try {
-      const res = await fetch(`/api/users/replies/${username}`);
-      const data = await res.json();
-      console.log("Replies data:", JSON.stringify(data, null, 2));
-      if (Array.isArray(data) && data.length > 0) {
-        const validReplies = data.filter(
-          (reply) => reply && reply.reply && reply.reply.createdAt
-        );
-        console.log("Valid replies:", JSON.stringify(validReplies, null, 2));
-        setReplies(validReplies);
-      } else {
-        setReplies([]);
-      }
+      const [taggedRes, repliesRes] = await Promise.all([
+        fetch(`/api/posts/tagged/${username}`),
+        fetch(`/api/users/replies/${username}`),
+      ]);
+      const taggedData = await taggedRes.json();
+      const repliesData = await repliesRes.json();
+
+      const combinedData = [
+        ...(taggedData.taggedPosts || []),
+        ...(repliesData || []),
+      ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      setRepliesAndTags(combinedData);
     } catch (error) {
       showToast("Error", error.message, "error");
-      setReplies([]);
+      setRepliesAndTags([]);
     } finally {
-      setFetchingReplies(false);
+      setFetchingRepliesAndTags(false);
     }
   };
 
   useEffect(() => {
     if (user) {
       getPosts();
-      if (activeTab === "replies") getReplies();
+      if (activeTab === "repliesAndTags") getRepliesAndTags();
     }
   }, [username, user, activeTab]);
 
@@ -118,14 +108,18 @@ const UserPage = () => {
         </Flex>
         <Flex
           flex={1}
-          borderBottom={activeTab === "replies" ? "2px solid" : "1px solid"}
-          borderColor={activeTab === "replies" ? "blue.500" : "gray.light"}
+          borderBottom={
+            activeTab === "repliesAndTags" ? "2px solid" : "1px solid"
+          }
+          borderColor={
+            activeTab === "repliesAndTags" ? "blue.500" : "gray.light"
+          }
           justifyContent={"center"}
           pb="3"
           cursor={"pointer"}
-          onClick={() => setActiveTab("replies")}
+          onClick={() => setActiveTab("repliesAndTags")}
         >
-          <Text fontWeight={"bold"}>Replies</Text>
+          <Text fontWeight={"bold"}>Replies & Tags</Text>
         </Flex>
         <Flex
           flex={1}
@@ -156,20 +150,24 @@ const UserPage = () => {
         </>
       )}
 
-      {activeTab === "replies" && (
+      {activeTab === "repliesAndTags" && (
         <>
-          {!fetchingReplies && replies.length === 0 && (
-            <Text>User has no replies.</Text>
+          {!fetchingRepliesAndTags && repliesAndTags.length === 0 && (
+            <Text>User has no replies or tags.</Text>
           )}
-          {fetchingReplies && (
+          {fetchingRepliesAndTags && (
             <Flex justifyContent={"center"} my={12}>
               <Spinner size={"xl"} />
             </Flex>
           )}
           <VStack spacing={4} align="stretch">
-            {replies.map((reply, index) => (
-              <UserReply key={`${reply._id}-${index}`} reply={reply} />
-            ))}
+            {repliesAndTags.map((item) =>
+              item.postText ? (
+                <UserReply key={item._id} reply={item} />
+              ) : (
+                <Post key={item._id} post={item} postedBy={item.postedBy} />
+              )
+            )}
           </VStack>
         </>
       )}

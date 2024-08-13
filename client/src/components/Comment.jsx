@@ -23,7 +23,7 @@ const Comment = ({ reply, lastReply }) => {
         </Flex>
       </Flex>
       {/* Divider if not the last reply */}
-      {!lastReply ? <Divider /> : null}
+      {/* {!lastReply ? <Divider /> : null} */}
     </>
   );
 };

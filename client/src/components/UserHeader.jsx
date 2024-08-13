@@ -2,7 +2,7 @@ import { Avatar } from "@chakra-ui/avatar";
 import { Box, Flex, Link, Text, VStack } from "@chakra-ui/layout";
 import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/menu";
 import { Portal } from "@chakra-ui/portal";
-import { Button, useToast } from "@chakra-ui/react";
+import { Button, useColorModeValue, useToast } from "@chakra-ui/react";
 import { BsInstagram } from "react-icons/bs";
 import { CgMoreO } from "react-icons/cg";
 import { useRecoilValue } from "recoil";
@@ -14,6 +14,9 @@ const UserHeader = ({ user }) => {
   const toast = useToast();
   const currentUser = useRecoilValue(userAtom); // logged in user
   const { handleFollowUnfollow, following, updating } = useFollowUnfollow(user);
+
+  const badgeBg = useColorModeValue("gray.200", "gray.dark");
+  const badgeColor = useColorModeValue("gray.800", "gray.light");
 
   // Copy the profile URL to clipboard
   const copyURL = () => {
@@ -49,8 +52,10 @@ const UserHeader = ({ user }) => {
             {user.badgeText && (
               <Text
                 fontSize={"xs"}
-                bg={"gray.dark"}
-                color={"gray.light"}
+                // bg={"gray.dark"}
+                // color={"gray.light"}
+                bg={badgeBg}
+                color={badgeColor}
                 px={1}
                 alignItems="25%"
                 borderRadius={"full"}

@@ -8,22 +8,29 @@ const AnonPostHeader = ({ shuffledUsers }) => {
     return <Avatar size="md" src="/anonymous-avatar.png" name="Anonymous" />;
   }
 
-  const avatarSize = "sm"; // Slightly larger size for better visibility
-  const containerSize = "60px"; // Increased size to accommodate the triangle
+  const avatarSize = "sm";
+  const containerSize = "60px";
 
   return (
     <Box position="relative" width={containerSize} height={containerSize}>
-      {users.slice(0, 3).map((user, index) => (
-        <Avatar
-          key={user._id || index}
-          size={avatarSize}
-          name={user.username}
-          src={user.profilePic}
-          position="absolute"
-          border="2px solid white"
-          {...getPosition(index, users.length)}
-        />
-      ))}
+      {users.slice(0, 3).map((user, index) => {
+        const userId = typeof user === "string" ? user : user._id;
+        const username = typeof user === "string" ? "Anonymous" : user.username;
+        const profilePic =
+          typeof user === "string" ? "/anonymous-avatar.png" : user.profilePic;
+
+        return (
+          <Avatar
+            key={userId || index}
+            size={avatarSize}
+            name={username}
+            src={profilePic}
+            position="absolute"
+            border="2px solid white"
+            {...getPosition(index, users.length)}
+          />
+        );
+      })}
     </Box>
   );
 };

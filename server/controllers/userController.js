@@ -280,12 +280,12 @@ const getUserReplies = async (req, res) => {
           reply: {
             _id: "$replies._id",
             text: "$replies.text",
-            createdAt: { $ifNull: ["$replies.createdAt", new Date()] },
+            createdAt: "$replies.createdAt",
             userId: "$replies.userId",
             username: "$replies.username",
             userProfilePic: "$replies.userProfilePic",
           },
-          createdAt: { $ifNull: ["$replies.createdAt", new Date()] },
+          createdAt: "$replies.createdAt",
         },
       },
     ]);

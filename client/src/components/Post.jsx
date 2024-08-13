@@ -11,6 +11,7 @@ import { DeleteIcon } from "@chakra-ui/icons";
 import { useRecoilState, useRecoilValue } from "recoil";
 import postsAtom from "../atoms/postsAtom";
 import AnonPostHeader from "./AnonPostHeader";
+import { useColorModeValue } from "@chakra-ui/react";
 
 const Post = ({ post, postedBy }) => {
   const currentUser = useRecoilValue(userAtom);
@@ -18,31 +19,39 @@ const Post = ({ post, postedBy }) => {
   const showToast = useShowToast();
   const [posts, setPosts] = useRecoilState(postsAtom);
   const navigate = useNavigate();
+  const teabagPostIcon = useColorModeValue(
+    "/anonymous5lightmode.png",
+    "/anonymous5.png"
+  );
+  const anonPostIcon = useColorModeValue(
+    "/anonymous2lightmode.png",
+    "/anonymous2.png"
+  );
 
   useEffect(() => {
-    console.log("Post component received:", { post, postedBy });
-    console.log("Post details:", {
-      id: post._id,
-      text: post.text,
-      postedBy: post.isAnonymous
-        ? "Anonymous"
-        : post.postedBy
-        ? post.postedBy.username
-        : "Unknown",
-      isAnonymous: post.isAnonymous,
-      taggedUsers: post.taggedUsers
-        ? post.taggedUsers.map((u) => u.username)
-        : [],
-      shuffledUsers: post.shuffledUsers
-        ? post.shuffledUsers.map((u) => u.username)
-        : [],
-    });
+    // logging stuff in case you implement something else and face an Omniman type error
+    // console.log("Post component received:", { post, postedBy });
+    // console.log("Post details:", {
+    //   id: post._id,
+    //   text: post.text,
+    //   postedBy: post.isAnonymous
+    //     ? "Anonymous"
+    //     : post.postedBy
+    //     ? post.postedBy.username
+    //     : "Unknown",
+    //   isAnonymous: post.isAnonymous,
+    //   taggedUsers: post.taggedUsers
+    //     ? post.taggedUsers.map((u) => u.username)
+    //     : [],
+    //   shuffledUsers: post.shuffledUsers
+    //     ? post.shuffledUsers.map((u) => u.username)
+    //     : [],
+    // });
+
     if (!postedBy) {
       console.error("postedBy is undefined");
       return;
     }
-    console.log("Is Anonymous:", post?.isAnonymous);
-    console.log("Shuffled Users:", post?.shuffledUsers);
 
     const getUser = async () => {
       try {
@@ -67,26 +76,19 @@ const Post = ({ post, postedBy }) => {
   }, [postedBy]);
 
   if (!user) {
-    return null; // or return a loading indicator
+    return null;
   }
 
   // null check
   if (!post || !postedBy || !currentUser) {
     console.log("Null check failed:", { post, postedBy, currentUser });
-    return null; // or return a loading indicator?
+    return null;
   }
 
   if (!user) {
     console.log("User is null, post:", post);
     return null;
   }
-
-  const replies = post.replies || [];
-
-  const isTagged =
-    post.taggedUsers &&
-    currentUser &&
-    post.taggedUsers.some((user) => user._id === currentUser._id);
 
   /* // before: home feed from following only
 const Post = ({ post, postedBy }) => {
@@ -139,6 +141,9 @@ const Post = ({ post, postedBy }) => {
     }
   };
 
+  const isTagged =
+    post.taggedUsers && post.taggedUsers.some((u) => u._id === currentUser._id);
+
   if (!user) return null;
   return (
     <Link to={`/${user.username}/post/${post._id}`}>
@@ -148,7 +153,15 @@ const Post = ({ post, postedBy }) => {
           {post.isAnonymous ? (
             <AnonPostHeader shuffledUsers={post.shuffledUsers} />
           ) : (
-            <RegularPostHeader user={user} navigate={navigate} />
+            <Avatar
+              size="md"
+              name={user.name}
+              src={user?.profilePic}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(`/${user.username}`);
+              }}
+            />
           )}
           <Box w="1px" h={"full"} bg="gray.light" my={2}></Box>
           <Box position={"relative"} w={"full"}>
@@ -202,12 +215,12 @@ const Post = ({ post, postedBy }) => {
                 }}
               >
                 <Text fontSize={"sm"} fontWeight={"bold"} mr={1}>
-                  {post.isAnonymous ? "" : user?.username}
+                  {post.isAnonymous ? "Anonymous" : user?.username}
                 </Text>
                 {post.isAnonymous ? (
                   <Flex alignItems="center">
-                    <Image src="/anonymous5.png" w={4} h={4} mr={1} />
-                    <Image src="/anonymous2.png" w={4} h={4} />
+                    <Image src={teabagPostIcon} w={4} h={4} mr={1} />
+                    <Image src={anonPostIcon} w={4} h={4} />
                   </Flex>
                 ) : (
                   <Image src="/verified.png" w={4} h={4} />
@@ -232,16 +245,18 @@ const Post = ({ post, postedBy }) => {
           </Flex>
 
           {/* Tagged indicator */}
+
           {isTagged && (
             <Text fontSize="xs" color="blue.500" fontWeight="bold">
               You were tagged in this post
             </Text>
           )}
-          {isTagged && post.postedBy._id !== currentUser._id && (
+          {/* @'s who tagged the user under the "You were tagged in this post" text. Not sure if I like it or not as it's a bit redundant. */}
+          {/* {isTagged && post.postedBy._id !== currentUser._id && (
             <Text fontSize="xs" color="gray.500">
               Tagged by @{post.postedBy.username}
             </Text>
-          )}
+          )} */}
 
           {/* Post text */}
           <Text fontSize={"sm"}>{post.text}</Text>

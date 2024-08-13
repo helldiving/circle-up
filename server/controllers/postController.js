@@ -97,15 +97,18 @@ const createPost = async (req, res) => {
 
 const getPost = async (req, res) => {
   try {
-    // Find the post by its ID
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.params.id)
+      .populate("postedBy", "username profilePic")
+      .populate("shuffledUsers", "username profilePic");
 
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
 
+    console.log("Fetched post:", JSON.stringify(post, null, 2));
     res.status(200).json(post);
   } catch (err) {
+    console.error("Error in getPost:", err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -320,6 +323,26 @@ const getUserTeabags = async (req, res) => {
   }
 };
 
+const getTaggedPosts = async (req, res) => {
+  const { username } = req.params;
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const taggedPosts = await Post.find({ taggedUsers: user._id })
+      .populate("postedBy", "_id username profilePic")
+      .populate("taggedUsers", "_id username")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ taggedPosts });
+  } catch (error) {
+    console.error("Error in getTaggedPosts:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export {
   createPost,
   getPost,
@@ -329,4 +352,5 @@ export {
   getFeedPosts,
   getUserPosts,
   getUserTeabags,
+  getTaggedPosts,
 };
