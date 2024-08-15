@@ -183,6 +183,7 @@ export default function UpdateProfilePage() {
               onChange={(e) =>
                 setInputs({ ...inputs, website: e.target.value })
               }
+              _placeholder={{ color: "gray.500" }}
               type="url"
             />
           </FormControl>
@@ -194,6 +195,7 @@ export default function UpdateProfilePage() {
               onChange={(e) =>
                 setInputs({ ...inputs, instagram: e.target.value })
               }
+              _placeholder={{ color: "gray.500" }}
               type="url"
             />
           </FormControl>

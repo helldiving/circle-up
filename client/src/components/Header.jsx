@@ -7,12 +7,18 @@ import { Link as RouterLink } from "react-router-dom";
 import { FiLogOut } from "react-icons/fi";
 import useLogout from "../hooks/useLogout";
 import authScreenAtom from "../atoms/authAtom";
+import { triviaCompletedAtom } from "../atoms/triviaAtom.js";
 
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const user = useRecoilValue(userAtom);
   const logout = useLogout();
   const setAuthScreen = useSetRecoilState(authScreenAtom);
+  const triviaCompleted = useRecoilValue(triviaCompletedAtom);
+
+  if (!triviaCompleted) {
+    return null; // header doesn't show if trivia not completed
+  }
 
   return (
     <Flex justifyContent={"space-between"} mt={6} mb="12">
