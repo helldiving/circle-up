@@ -32,9 +32,9 @@ const PostPage = () => {
   const { pid } = useParams();
   const currentUser = useRecoilValue(userAtom);
   const navigate = useNavigate();
-  const teabagPostIcon = useColorModeValue(
-    "/anonymous5lightmode.png",
-    "/anonymous5.png"
+  const framePostIcon = useColorModeValue(
+    "/anonymous6lightmode.png",
+    "/anonymous6.png"
   );
   const anonPostIcon = useColorModeValue(
     "/anonymous2lightmode.png",
@@ -168,7 +168,7 @@ const PostPage = () => {
                     <Text fontSize={"sm"} fontWeight={"bold"} mr={1}>
                       Anonymous
                     </Text>
-                    <Image src={teabagPostIcon} w={4} h={4} mr={1} />
+                    <Image src={framePostIcon} w={4} h={4} mr={1} />
                     <Image src={anonPostIcon} w={4} h={4} />
                   </Flex>
                 ) : (

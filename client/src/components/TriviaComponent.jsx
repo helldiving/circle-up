@@ -11,6 +11,7 @@ import {
   Image,
   useBreakpointValue,
   Flex,
+  Spinner,
 } from "@chakra-ui/react";
 import useTrivia from "../hooks/useTrivia";
 import { triviaData } from "../data/triviaData";
@@ -33,6 +34,10 @@ const TriviaComponent = () => {
   const incorrectSoundRef = useRef(null);
   const [isIncorrectFeedbackActive, setIsIncorrectFeedbackActive] =
     useState(false);
+  const [preloadedImages, setPreloadedImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [assetsLoaded, setAssetsLoaded] = useState(false);
 
   const containerWidth = useBreakpointValue({ base: "90%", md: "60%" });
   const containerPadding = useBreakpointValue({ base: 4, md: 8 });
@@ -47,49 +52,124 @@ const TriviaComponent = () => {
     md: "60vw",
   });
 
+  const preloadImages = useCallback(async () => {
+    const imageUrls = Array.from(
+      { length: 22 },
+      (_, i) => `/assets/incorrectimage${i + 1}.jpg`
+    );
+
+    try {
+      const loadedImages = await Promise.all(
+        imageUrls.map((url) =>
+          fetch(url)
+            .then((response) => response.blob())
+            .then((blob) => URL.createObjectURL(blob))
+        )
+      );
+      console.log("Images preloaded successfully:", loadedImages);
+      setPreloadedImages(loadedImages);
+      return true;
+    } catch (error) {
+      console.error("Error preloading images:", error);
+      return false;
+    }
+  }, []);
+
+  const preloadAudio = useCallback(() => {
+    return new Promise((resolve) => {
+      incorrectSoundRef.current = new Audio("/assets/incorrectSound.mp3");
+      incorrectSoundRef.current.addEventListener(
+        "canplaythrough",
+        () => {
+          console.log("Audio loaded successfully");
+          resolve(true);
+        },
+        { once: true }
+      );
+      incorrectSoundRef.current.addEventListener(
+        "error",
+        () => {
+          console.error("Error loading audio");
+          resolve(false);
+        },
+        { once: true }
+      );
+      incorrectSoundRef.current.load();
+    });
+  }, []);
+
   useEffect(() => {
-    incorrectSoundRef.current = new Audio("/assets/incorrectSound.mp3");
+    const loadAssets = async () => {
+      setIsLoading(true);
+      const [imagesLoaded, audioLoaded] = await Promise.all([
+        preloadImages(),
+        preloadAudio(),
+      ]);
+      console.log("Assets loaded:", { imagesLoaded, audioLoaded });
+      setAssetsLoaded(imagesLoaded && audioLoaded);
+      setIsLoading(false);
+    };
+
+    loadAssets();
+
     return () => {
       if (incorrectSoundRef.current) {
         incorrectSoundRef.current.pause();
         incorrectSoundRef.current = null;
       }
+      preloadedImages.forEach(URL.revokeObjectURL);
     };
-  }, []);
+  }, [preloadImages, preloadAudio]);
 
-  const getRandomIncorrectImage = () => {
-    const imageNumber = Math.floor(Math.random() * 22) + 1;
-    return `/assets/incorrectimage${imageNumber}.jpg`;
-  };
+  const getRandomIncorrectImage = useCallback(() => {
+    console.log("Preloaded images count:", preloadedImages.length);
+    if (preloadedImages.length > 0) {
+      const randomIndex = Math.floor(Math.random() * preloadedImages.length);
+      const selectedImage = preloadedImages[randomIndex];
+      console.log("Selected image:", selectedImage);
+      return selectedImage;
+    }
+    console.warn("No preloaded images available");
+    return null;
+  }, [preloadedImages]);
 
-  const playIncorrectSound = () => {
+  const playIncorrectSound = useCallback(() => {
     if (incorrectSoundRef.current) {
       incorrectSoundRef.current.currentTime = 0;
       incorrectSoundRef.current
         .play()
         .catch((error) => console.error("Error playing sound:", error));
+    } else {
+      console.warn("Incorrect sound reference is not available");
     }
-  };
+  }, []);
 
-  const showIncorrectFeedback = () => {
+  const showIncorrectFeedback = useCallback(() => {
+    console.log("Showing incorrect feedback. Assets loaded:", assetsLoaded);
+    if (!assetsLoaded) {
+      console.warn("Assets not yet loaded, skipping incorrect feedback");
+      return;
+    }
     setIsIncorrectFeedbackActive(true);
     playIncorrectSound();
-    setIncorrectImage(getRandomIncorrectImage());
-    setTimeout(() => {
+    const randomImage = getRandomIncorrectImage();
+    console.log("Setting incorrect image:", randomImage);
+    if (randomImage) {
+      setIncorrectImage(randomImage);
+      setTimeout(() => {
+        setIsIncorrectFeedbackActive(false);
+        setIncorrectImage(null);
+      }, 1000);
+    } else {
+      console.error("Failed to get a random incorrect image");
       setIsIncorrectFeedbackActive(false);
-      setIncorrectImage(null);
-    }, 1000);
-  };
-
-  const getGridColumns = (optionsLength) => {
-    if (optionsLength <= 2) return 1;
-    if (optionsLength <= 4) return 2;
-    return 3;
-  };
+    }
+  }, [getRandomIncorrectImage, playIncorrectSound, assetsLoaded]);
 
   const handleAnswer = useCallback(
     (selectedAnswer) => {
-      if (!isIncorrectFeedbackActive) {
+      console.log("Handling answer. Assets loaded:", assetsLoaded);
+      if (!isIncorrectFeedbackActive && assetsLoaded) {
         const isCorrect = checkAnswer(selectedAnswer);
         if (isCorrect) {
           setShowPasswordPrompt(true);
@@ -98,13 +178,26 @@ const TriviaComponent = () => {
         }
       }
     },
-    [checkAnswer, setShowPasswordPrompt, isIncorrectFeedbackActive]
+    [
+      checkAnswer,
+      setShowPasswordPrompt,
+      isIncorrectFeedbackActive,
+      showIncorrectFeedback,
+      assetsLoaded,
+    ]
   );
 
+  const getGridColumns = useCallback((optionsLength) => {
+    if (optionsLength <= 2) return 1;
+    if (optionsLength <= 4) return 2;
+    return 3;
+  }, []);
+
   const handlePasswordSubmit = useCallback(() => {
-    const correctPassword = "password";
+    const correctPassword = "rock";
     if (enteredPassword === correctPassword) {
       setTriviaCompleted(true);
+      localStorage.setItem("trivia-completed", "true");
       navigate("/auth");
     } else {
       console.log("Incorrect password!");
@@ -112,13 +205,21 @@ const TriviaComponent = () => {
     setEnteredPassword("");
   }, [enteredPassword, navigate, setTriviaCompleted]);
 
+  if (isLoading) {
+    return (
+      <Flex justify="center" align="center" height="100vh">
+        <Spinner size="xl" color="white" />
+      </Flex>
+    );
+  }
+
   return (
     <Flex
       direction="column"
       align="center"
       justify="flex-start"
       width="100%"
-      height="120%"
+      height="125%"
       pt="15vh"
     >
       <Box
@@ -157,7 +258,7 @@ const TriviaComponent = () => {
               <Heading
                 as="h2"
                 size="xl"
-                mb={6}
+                mb={0}
                 color="white"
                 textAlign="center"
               >
@@ -207,7 +308,7 @@ const TriviaComponent = () => {
           display="flex"
           justifyContent="center"
           alignItems="flex-start"
-          paddingTop="8vh"
+          paddingTop="6vh"
           zIndex={9999}
           bg="rgba(0,0,0,0.7)"
         >

@@ -29,6 +29,7 @@ const useLogout = () => {
 
       // Clear the user info from local storage and state
       localStorage.removeItem("user-info");
+      localStorage.removeItem("trivia-completed");
       setUser(null);
       setPosts([]);
       navigate("/auth"); // navigate back to login page

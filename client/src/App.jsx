@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Container } from "@chakra-ui/react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "./atoms/userAtom.js";
 import { triviaCompletedAtom } from "./atoms/triviaAtom.js";
 import Header from "./components/Header";
@@ -26,8 +26,23 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
-  const user = useRecoilValue(userAtom);
-  const triviaCompleted = useRecoilValue(triviaCompletedAtom);
+  const [user, setUser] = useRecoilState(userAtom);
+  const [triviaCompleted, setTriviaCompleted] =
+    useRecoilState(triviaCompletedAtom);
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user-info"));
+    const storedTriviaCompleted =
+      localStorage.getItem("trivia-completed") === "true";
+
+    if (storedUser) {
+      setUser(storedUser);
+    }
+
+    if (storedTriviaCompleted) {
+      setTriviaCompleted(true);
+    }
+  }, [setUser, setTriviaCompleted]);
 
   return (
     <Container maxW="620px">
@@ -35,7 +50,7 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={triviaCompleted ? <Navigate to="/auth" /> : <WelcomePage />}
+          element={triviaCompleted ? <Navigate to="/home" /> : <WelcomePage />}
         />
         <Route path="/trivia" element={<TriviaPage />} />
         <Route

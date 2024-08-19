@@ -21,12 +21,14 @@ import { useSetRecoilState } from "recoil";
 import authScreenAtom from "../atoms/authAtom";
 import useShowToast from "../hooks/useShowToast";
 import userAtom from "../atoms/userAtom";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginCard() {
   const [showPassword, setShowPassword] = useState(false);
   const setAuthScreen = useSetRecoilState(authScreenAtom);
   const setUser = useSetRecoilState(userAtom);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const [inputs, setInputs] = useState({
     username: "",
@@ -52,7 +54,8 @@ export default function LoginCard() {
       }
 
       localStorage.setItem("user-info", JSON.stringify(data));
-      setUser(data); // updates user's state navigating us to the homepage
+      setUser(data);
+      navigate("/home");
     } catch (error) {
       showToast("Error", error, "error");
     } finally {

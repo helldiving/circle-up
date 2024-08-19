@@ -36,6 +36,7 @@ import {
   PiSealQuestion,
   PiSealQuestionFill,
 } from "react-icons/pi";
+import { MdOutlineFilterFrames, MdFilterFrames } from "react-icons/md";
 import UserSelection from "./UserSelection";
 
 const MAX_CHAR = 500;
@@ -119,7 +120,7 @@ const CreatePost = () => {
   // Handle creating a new post
   const handleCreatePost = async () => {
     if (isAnonymous && selectedUsers.length !== 2) {
-      showToast("Error", "Please select 2 users to teabag", "error");
+      showToast("Error", "Please select 2 users to teatoss", "error");
       return;
     }
     setLoading(true);
@@ -251,9 +252,9 @@ const CreatePost = () => {
                   minW="auto"
                 >
                   {isAnonymous ? (
-                    <PiTeaBagFill size={20} />
+                    <MdOutlineFilterFrames size={20} />
                   ) : (
-                    <PiTeaBag size={20} />
+                    <MdFilterFrames size={20} />
                   )}
                 </Button>
 
@@ -293,7 +294,7 @@ const CreatePost = () => {
             {isAnonymous && (
               <>
                 <Text mt={2}>
-                  Select 2 users to teabag (selected: {selectedUsers.length}/2):
+                  Select 2 users to frame (selected: {selectedUsers.length}/2):
                 </Text>
                 <UserSelection
                   selectedUsers={selectedUsers}

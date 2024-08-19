@@ -280,7 +280,7 @@ const getUserPosts = async (req, res) => {
         post.postedBy._id.toString() !== user._id.toString() &&
         post.taggedUsers.some((u) => u._id.toString() === user._id.toString())
     );
-    const teabagPosts = posts.filter(
+    const framePosts = posts.filter(
       (post) =>
         post.isAnonymous &&
         post.shuffledUsers.some((u) => u._id.toString() === user._id.toString())
@@ -288,17 +288,17 @@ const getUserPosts = async (req, res) => {
 
     console.log("User's own posts:", userPosts.length);
     console.log("Posts where user is tagged:", taggedPosts.length);
-    console.log("Teabag posts:", teabagPosts.length);
+    console.log("Frame posts:", framePosts.length);
 
-    res.status(200).json({ userPosts, taggedPosts, teabagPosts });
+    res.status(200).json({ userPosts, taggedPosts, framePosts });
   } catch (error) {
     console.error("Error in getUserPosts:", error);
     res.status(500).json({ error: error.message });
   }
 };
 
-const getUserTeabags = async (req, res) => {
-  console.log("getUserTeabags called");
+const getUserFrames = async (req, res) => {
+  console.log("getUserFrames called");
   const { username } = req.params;
   try {
     const user = await User.findOne({ username });
@@ -306,7 +306,7 @@ const getUserTeabags = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const teabags = await Post.find({
+    const frame = await Post.find({
       isAnonymous: true,
       shuffledUsers: user._id,
     })
@@ -314,11 +314,11 @@ const getUserTeabags = async (req, res) => {
       .populate("shuffledUsers", "_id username profilePic")
       .sort({ createdAt: -1 });
 
-    console.log("Teabags found:", teabags); // Add this line for debugging
+    console.log("Frames found:", frame);
 
-    res.status(200).json(teabags);
+    res.status(200).json(frame);
   } catch (error) {
-    console.error("Error in getUserTeabags:", error);
+    console.error("Error in getUserFrames:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -351,6 +351,6 @@ export {
   replyToPost,
   getFeedPosts,
   getUserPosts,
-  getUserTeabags,
+  getUserFrames,
   getTaggedPosts,
 };

@@ -17,7 +17,7 @@ const UserPage = () => {
   const [activeTab, setActiveTab] = useState("publications");
   const [userPosts, setUserPosts] = useState([]);
   const [taggedPosts, setTaggedPosts] = useState([]);
-  const [teabagPosts, setTeabagPosts] = useState([]);
+  const [framePosts, setframePosts] = useState([]);
 
   const getPosts = async () => {
     if (!user) return;
@@ -29,18 +29,18 @@ const UserPage = () => {
       if (data.userPosts && Array.isArray(data.userPosts)) {
         setUserPosts(data.userPosts);
         setTaggedPosts(data.taggedPosts || []);
-        setTeabagPosts(data.teabagPosts || []);
+        setframePosts(data.framePosts || []);
       } else {
         console.error("Received unexpected data structure:", data);
         setUserPosts([]);
         setTaggedPosts([]);
-        setTeabagPosts([]);
+        setframePosts([]);
       }
     } catch (error) {
       console.error("Error fetching posts:", error);
       setUserPosts([]);
       setTaggedPosts([]);
-      setTeabagPosts([]);
+      setframePosts([]);
     } finally {
       setFetchingPosts(false);
     }
@@ -123,14 +123,14 @@ const UserPage = () => {
         </Flex>
         <Flex
           flex={1}
-          borderBottom={activeTab === "teabags" ? "2px solid" : "1px solid"}
-          borderColor={activeTab === "teabags" ? "blue.500" : "gray.light"}
+          borderBottom={activeTab === "frame" ? "2px solid" : "1px solid"}
+          borderColor={activeTab === "frame" ? "blue.500" : "gray.light"}
           justifyContent={"center"}
           pb="3"
           cursor={"pointer"}
-          onClick={() => setActiveTab("teabags")}
+          onClick={() => setActiveTab("frame")}
         >
-          <Text fontWeight={"bold"}>Teabags</Text>
+          <Text fontWeight={"bold"}>Frames</Text>
         </Flex>
       </Flex>
 
@@ -172,17 +172,17 @@ const UserPage = () => {
         </>
       )}
 
-      {activeTab === "teabags" && (
+      {activeTab === "frame" && (
         <>
-          {!fetchingPosts && teabagPosts.length === 0 && (
-            <Text>User has not been teabagged.</Text>
+          {!fetchingPosts && framePosts.length === 0 && (
+            <Text>User has not been framed.</Text>
           )}
           {fetchingPosts && (
             <Flex justifyContent={"center"} my={12}>
               <Spinner size={"xl"} />
             </Flex>
           )}
-          {teabagPosts.map((post) => (
+          {framePosts.map((post) => (
             <Post key={post._id} post={post} postedBy={post.postedBy} />
           ))}
         </>
