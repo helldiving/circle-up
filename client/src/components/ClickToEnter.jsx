@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Heading, Button, VStack } from "@chakra-ui/react";
+import { Box, Heading, Button, VStack, Text } from "@chakra-ui/react";
 import VideoBackground from "./VideoBackground";
 
 const ClickToEnter = () => {
@@ -30,8 +30,12 @@ const ClickToEnter = () => {
           textAlign="center"
           color="white"
         >
-          Welcome to the Lil Amigoverse
+          Welcome to Circle Up!
         </Heading>
+        <Text color="gray" fontSize={["sm", "md"]} textAlign="center">
+          This is an example of how a circle might customize their invite screen
+          or authentication page
+        </Text>
         <Button
           onClick={handleEnter}
           size={["md", "lg"]}

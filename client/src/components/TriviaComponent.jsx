@@ -54,7 +54,7 @@ const TriviaComponent = () => {
 
   const preloadImages = useCallback(async () => {
     const imageUrls = Array.from(
-      { length: 22 },
+      { length: 17 },
       (_, i) => `/assets/incorrectimage${i + 1}.jpg`
     );
 
@@ -245,7 +245,7 @@ const TriviaComponent = () => {
                 type="password"
                 value={enteredPassword}
                 onChange={(e) => setEnteredPassword(e.target.value)}
-                placeholder="Enter password"
+                placeholder="password: rock"
                 size="lg"
                 color="white"
               />

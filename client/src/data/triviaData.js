@@ -1,6 +1,6 @@
 export const triviaData = [
   {
-    question: "Who loves The Wheel of Time?",
+    question: "Whose bedsheets are The Wheel of Time themed?",
     options: ["Beta Eclipse", "Decimition", "UnboltingEnd", "HaveAKnivesDay"],
     correctAnswer: "Beta Eclipse",
   },
@@ -11,8 +11,7 @@ export const triviaData = [
     correctAnswer: "Baby Jesus",
   },
   {
-    question:
-      "Which two blokes yap about fictional fantasy books that everyone else should read please i'm begging you?",
+    question: "Which two blokes yap about the Stormlight Archive?",
     options: [
       "HaveAKnivesDay and Jameson",
       "Beta Eclipse and Dectrix ",
@@ -22,8 +21,7 @@ export const triviaData = [
     correctAnswer: "Beta Eclipse and Dectrix",
   },
   {
-    question:
-      "Who does not rep pickleball because they know they would get dominated?",
+    question: "Who uses their freewill to NOT play pickleball with the boys?",
     options: ["Jameson", "UnboltingEnd", "Beta Eclipse", "HaveAKnivesDay"],
     correctAnswer: "Beta Eclipse",
   },
@@ -53,11 +51,11 @@ export const triviaData = [
     correctAnswer: "Decimition",
   },
   {
-    question: "Who is Thomas Sandargas?",
+    question: "Who is Thomas S. aka JusticeAlwaysPrevails?",
     options: [
       "Lord of the Rings bloke",
       "13th Disciple",
-      "Nutblasters rareform",
+      "UnboltingEnd's rareform",
       "The light that exposed the world",
     ],
     correctAnswer: "The light that exposed the world",
@@ -69,8 +67,13 @@ export const triviaData = [
   },
   {
     question: "Game of Thrones biggest fan?",
-    options: ["Reverse Cow", "Reverse Cow", "Reverse Cow", "Reverse Cow"],
-    correctAnswer: "Reverse Cow",
+    options: [
+      "HaveAKnivesDay",
+      "HaveAKnivesDay",
+      "HaveAKnivesDay",
+      "HaveAKnivesDay",
+    ],
+    correctAnswer: "HaveAKnivesDay",
   },
 
   // Add more trivia questions and answers here
